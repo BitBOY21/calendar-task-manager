@@ -86,7 +86,6 @@ function App() {
     const renderContent = () => {
         switch (currentView) {
             case 'dashboard':
-                // Pass user prop to Dashboard
                 return <Dashboard onChangeView={setCurrentView} user={user} />;
             
             case 'calendar': 
@@ -103,7 +102,12 @@ function App() {
                        />;
             
             case 'list': 
-                return <MySummary tasks={tasks} user={user} />;
+                return <MySummary 
+                            tasks={tasks} 
+                            user={user} 
+                            onUpdate={handleUpdateTask} // Pass update handler
+                            onDelete={handleDeleteTask} // Pass delete handler
+                       />;
 
             case 'history':
                 return <History tasks={tasks} onRestore={async (id) => {

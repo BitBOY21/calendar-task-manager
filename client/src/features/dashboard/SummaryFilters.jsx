@@ -70,8 +70,8 @@ const SummaryFilters = ({
                                 onClick={() => toggleTag(tag)}
                                 style={{
                                     ...styles.tagBtn,
-                                    background: isActive 
-                                        ? 'linear-gradient(135deg, rgba(0,123,255,0.15), rgba(111,66,193,0.15))' 
+                                    background: isActive
+                                        ? 'linear-gradient(135deg, rgba(0,123,255,0.15), rgba(111,66,193,0.15))'
                                         : 'transparent',
                                     backgroundColor: isActive ? '#e3f2fd' : 'transparent',
                                     color: isActive ? '#1565c0' : '#666',
@@ -90,26 +90,26 @@ const SummaryFilters = ({
 };
 
 const styles = {
-    container: { 
+    container: {
         ...cardStyle,
-        marginBottom: '24px' 
+        marginBottom: '24px'
     },
     row: { 
         display: 'flex', 
         alignItems: 'center', 
         gap: '20px', 
-        marginBottom: '20px', 
-        flexWrap: 'wrap' 
+        marginBottom: '20px',
+        flexWrap: 'wrap'
     },
     group: { 
         display: 'flex', 
         alignItems: 'center', 
-        gap: '12px' 
+        gap: '12px'
     },
     label: { 
-        fontWeight: '700', 
-        color: '#333', 
-        fontSize: '0.9rem', 
+        fontWeight: '700',
+        color: '#333',
+        fontSize: '0.9rem',
         marginRight: '8px',
         textTransform: 'uppercase',
         letterSpacing: '0.5px'
@@ -120,7 +120,7 @@ const styles = {
     },
     divider: { 
         width: '1px', 
-        height: '30px', 
+        height: '30px',
         backgroundColor: '#e0e0e0' 
     },
     
@@ -133,12 +133,12 @@ const styles = {
     tagsWrapper: { 
         display: 'flex', 
         flexWrap: 'wrap', 
-        gap: '10px' 
+        gap: '10px'
     },
     tagBtn: { 
         border: '1px solid', 
-        padding: '6px 14px', 
-        borderRadius: '12px', 
+        padding: '6px 14px',
+        borderRadius: '12px',
         cursor: 'pointer', 
         fontSize: '0.8rem', 
         backgroundColor: 'transparent',
