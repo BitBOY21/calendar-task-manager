@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { useTaskContext } from '../../context/TaskContext'; 
-import CalendarView from '../tasks/components/CalendarView'; // Updated path
-import TaskList from '../tasks/components/TaskList'; // Updated path
-import TaskFilters from '../tasks/components/TaskFilters'; // Updated path (was SidebarFilters)
-import TaskForm from '../tasks/components/TaskForm'; // Updated path
-import Card from '../../components/ui/Card';
+import { useTaskContext } from '../context/TaskContext'; 
+import CalendarView from '../features/tasks/components/CalendarView'; 
+import TaskList from '../features/tasks/components/TaskList'; 
+import TaskFilters from '../features/tasks/components/TaskFilters'; 
+import TaskForm from '../features/tasks/components/TaskForm'; 
+import Card from '../components/ui/Card';
 
-const WorkView = ({ onDateSelect, onEventDrop, onEventClick }) => { 
+const WorkPage = ({ onDateSelect, onEventDrop, onEventClick }) => { 
     const { tasks, updateTask, deleteTask } = useTaskContext();
     
     const [filters, setFilters] = useState({
@@ -114,7 +114,7 @@ const styles = {
         flexDirection: 'column', 
         overflow: 'hidden',
         height: '100%',
-        padding: '0'
+        padding: '0' 
     },
     
     filtersSection: {
@@ -144,4 +144,4 @@ const styles = {
     }
 };
 
-export default WorkView;
+export default WorkPage;

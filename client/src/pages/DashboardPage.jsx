@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { useTaskContext } from '../../context/TaskContext'; 
-import TaskForm from '../tasks/components/TaskForm'; // Updated path
-import TaskList from '../tasks/components/TaskList'; // Updated path
-import DailySummaryAI from './DailySummaryAI';
-import StatsRow from './components/StatsRow';
-import Card from '../../components/ui/Card';
-import Button from '../../components/ui/Button';
+import { useTaskContext } from '../context/TaskContext'; 
+import TaskForm from '../features/tasks/components/TaskForm'; 
+import TaskList from '../features/tasks/components/TaskList'; 
+import DailySummaryAI from '../features/dashboard/components/DailySummaryAI'; // Updated path
+import StatsRow from '../features/dashboard/components/StatsRow'; // Updated path
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
 import { FaPlus } from 'react-icons/fa';
 
-const Dashboard = ({ user }) => { 
+const DashboardPage = ({ user }) => { 
     const { tasks, addTask, updateTask, deleteTask, generateAI } = useTaskContext();
     
     const [selectedDate, setSelectedDate] = useState(null);
@@ -95,7 +95,7 @@ const Dashboard = ({ user }) => {
                 <FaPlus />
             </Button>
 
-            <TaskForm
+            <TaskForm 
                 isOpen={isAddModalOpen || !!editingTask} 
                 onClose={() => {
                     setIsAddModalOpen(false);
@@ -128,4 +128,4 @@ const styles = {
     emptyState: { textAlign: 'center', padding: '40px', color: '#888' },
 };
 
-export default Dashboard;
+export default DashboardPage;

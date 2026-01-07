@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useTaskContext } from './context/TaskContext'; // Use Context
+import { useTaskContext } from './context/TaskContext'; 
 import Sidebar from './components/layout/Sidebar';
 import TaskDrawer from './components/layout/TaskDrawer';
-import Dashboard from './features/dashboard/Dashboard'; 
-import DashboardStats from './features/dashboard/DashboardStats';
-import WorkView from './features/dashboard/WorkView';
-import Settings from './features/dashboard/Settings';
-import TaskFormModal from './features/dashboard/TaskFormModal';
-import MySummary from './features/dashboard/MySummary';
-import History from './features/dashboard/History';
+import DashboardPage from './pages/DashboardPage'; // Updated path
+import WorkPage from './pages/WorkPage'; // Updated path
+import AnalyticsPage from './pages/AnalyticsPage'; // Updated path
+import HistoryPage from './pages/HistoryPage'; // Updated path
+import SettingsPage from './pages/SettingsPage'; // Updated path
+import TaskForm from './features/tasks/components/TaskForm'; 
 import Login from './features/auth/Login';
 import { authService } from './services/authService';
 import { FaPlus } from 'react-icons/fa';
@@ -19,10 +18,8 @@ function App() {
     const [user, setUser] = useState({ name: 'User' });
     const [currentView, setCurrentView] = useState('dashboard'); 
     
-    // Context Hooks
     const { addTask, updateTask, deleteTask } = useTaskContext();
 
-    // UI States
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false); 
     const [selectedTask, setSelectedTask] = useState(null);
@@ -36,7 +33,6 @@ function App() {
         }
     }, []);
 
-    // --- Handlers ---
     const handleTaskClick = (task) => {
         setSelectedTask(task);
         setIsDrawerOpen(true);
@@ -70,14 +66,13 @@ function App() {
         setUser({ name: 'User' });
     };
 
-    // --- Render Content ---
     const renderContent = () => {
         switch (currentView) {
             case 'dashboard':
-                return <Dashboard onChangeView={setCurrentView} user={user} />;
+                return <DashboardPage onChangeView={setCurrentView} user={user} />;
             
             case 'calendar': 
-                return <WorkView 
+                return <WorkPage 
                             onDateSelect={(date) => {
                                 setSelectedDate(date);
                                 setIsAddModalOpen(true);
@@ -87,19 +82,19 @@ function App() {
                        />;
             
             case 'list': 
-                return <MySummary user={user} />;
+                return <AnalyticsPage user={user} />;
 
             case 'history':
-                return <History />;
+                return <HistoryPage />;
 
             case 'settings':
-                return <Settings user={user} />;
+                return <SettingsPage user={user} />;
             
             case 'stats':
-                return <DashboardStats user={user} />;
+                return <AnalyticsPage user={user} />;
 
             default:
-                return <Dashboard onChangeView={setCurrentView} user={user} />;
+                return <DashboardPage onChangeView={setCurrentView} user={user} />;
         }
     };
 
@@ -142,7 +137,7 @@ function App() {
                 onDelete={handleDeleteTask}
             />
 
-            <TaskFormModal 
+            <TaskForm
                 isOpen={isAddModalOpen}
                 onClose={() => {
                     setIsAddModalOpen(false);
