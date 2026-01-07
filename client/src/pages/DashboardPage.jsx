@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useTaskContext } from '../context/TaskContext'; 
 import TaskForm from '../features/tasks/components/TaskForm'; 
 import TaskList from '../features/tasks/components/TaskList'; 
-import DailySummaryAI from '../features/dashboard/components/DailySummaryAI'; // Updated path
-import StatsRow from '../features/dashboard/components/StatsRow'; // Updated path
+import DailySummaryAI from '../features/dashboard/components/DailySummaryAI'; 
+import StatsRow from '../features/dashboard/components/StatsRow'; 
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { FaPlus } from 'react-icons/fa';
@@ -112,7 +112,7 @@ const DashboardPage = ({ user }) => {
 };
 
 const styles = {
-    container: { maxWidth: '1000px', margin: '0 auto', padding: '20px', position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f4f6f9' },
+    container: { maxWidth: '1000px', margin: '0 auto', padding: '20px', position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column' }, // Removed backgroundColor
     
     headerContainer: { textAlign: 'center', marginBottom: '25px' },
     greeting: { margin: 0, fontSize: '2.2rem', fontWeight: '800', color: '#333' },

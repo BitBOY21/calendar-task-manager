@@ -111,7 +111,7 @@ const styles = {
         padding: '40px',
         maxWidth: '1000px',
         margin: '0 auto',
-        background: '#f4f6f9',
+        // Removed backgroundColor
         height: '100%', 
         overflowY: 'auto',
         paddingBottom: '80px' 

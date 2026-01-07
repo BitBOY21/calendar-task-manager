@@ -92,7 +92,7 @@ const styles = {
         gap: '20px',
         padding: '20px',
         overflow: 'hidden',
-        backgroundColor: '#f4f6f9',
+        // Removed backgroundColor
         maxWidth: '1600px', 
         margin: '0 auto'
     },

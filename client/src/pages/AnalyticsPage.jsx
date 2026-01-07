@@ -162,7 +162,7 @@ const AnalyticsPage = ({ user }) => {
 };
 
 const styles = {
-    container: { padding: '30px', maxWidth: '1200px', margin: '0 auto', paddingBottom: '60px', height: '100%', overflowY: 'auto', background: '#f4f6f9' },
+    container: { padding: '30px', maxWidth: '1200px', margin: '0 auto', paddingBottom: '60px', height: '100%', overflowY: 'auto' }, // Removed backgroundColor
     header: { marginBottom: '25px', textAlign: 'center' },
     subtitle: { color: '#666', fontSize: '1.1rem', fontWeight: '400' },
     
