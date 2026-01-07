@@ -74,22 +74,21 @@ const Sidebar = ({ currentView, onChangeView, onLogout }) => {
 const styles = {
     sidebarContainer: {
         height: '100vh',
-        padding: '20px', // Margin from screen edges
+        padding: '20px', // Creates the 20px margin from top, bottom, and left
         display: 'flex',
         flexDirection: 'column',
-        zIndex: 100 // Ensure it stays above content if needed
+        zIndex: 100
     },
     sidebar: {
         width: '260px',
-        backgroundColor: 'rgba(255, 255, 255, 0.95)', // Slight transparency
-        backdropFilter: 'blur(10px)', // Glass effect
+        backgroundColor: '#ffffff', // Pure white as requested
         borderRadius: '20px', // Rounded corners
         display: 'flex',
         flexDirection: 'column',
         padding: '24px 0',
-        height: '100%', // Fill the container (which has padding)
+        height: '100%', // Fills the container (100vh - 40px)
         boxShadow: '0 10px 30px rgba(0,0,0,0.05)', // Soft shadow
-        border: '1px solid rgba(255,255,255,0.5)' // Subtle border
+        border: 'none' // Removed border for cleaner floating look
     },
     logoContainer: {
         textAlign: 'center',
@@ -137,7 +136,7 @@ const styles = {
         fontWeight: '500' 
     },
     footer: { 
-        borderTop: '1px solid #e0e0e0', 
+        borderTop: '1px solid #f0f0f0', // Lighter border for footer
         paddingTop: '16px',
         padding: '16px 12px 0 12px'
     }

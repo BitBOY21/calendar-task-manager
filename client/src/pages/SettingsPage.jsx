@@ -92,6 +92,7 @@ const styles = {
     },
     input: {
         width: '100%',
+        maxWidth: '600px', // Added max-width
         padding: '12px',
         borderRadius: '8px',
         border: '1px solid #e0e0e0',
@@ -101,6 +102,7 @@ const styles = {
     },
     select: {
         width: '100%',
+        maxWidth: '600px', // Added max-width
         padding: '12px',
         borderRadius: '8px',
         border: '1px solid #e0e0e0',
