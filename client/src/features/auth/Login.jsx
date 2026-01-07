@@ -11,18 +11,24 @@ const Login = ({ onLogin }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('🖱️ UI: Submit Clicked');
         setError('');
 
         try {
             let data;
             if (isRegistering) {
+                console.log('🔵 UI: Calling Register...');
                 data = await authService.register(username, email, password);
             } else {
+                console.log('🔵 UI: Calling Login...');
                 data = await authService.login(email, password);
             }
-            // Pass the FULL data object (token + user info)
+            console.log('✅ UI: Auth Success, Data:', data);
+            
+            // Pass the FULL data object
             onLogin(data);
         } catch (err) {
+            console.error('❌ UI: Auth Failed', err);
             const msg = err.response?.data?.message || 'Something went wrong';
             const details = err.response?.data?.errors ? ` (${err.response.data.errors.join(', ')})` : '';
             setError(msg + details);

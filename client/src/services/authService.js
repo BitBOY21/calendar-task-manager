@@ -1,51 +1,50 @@
 import api from '../api';
 
-// Central service for managing user authentication
-
 export const authService = {
-    // Login
     login: async (email, password) => {
-        const response = await api.post('/auth/login', { email, password });
-        if (response.data.token) {
-            localStorage.setItem('token', response.data.token);
-            // Save user name if available
-            if (response.data.name) {
-                localStorage.setItem('userName', response.data.name);
+        console.log('🔵 Client: Sending Login Request...', { email });
+        try {
+            const response = await api.post('/auth/login', { email, password });
+            console.log('🟢 Client: Login Response:', response.data);
+            
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+                if (response.data.name) {
+                    localStorage.setItem('userName', response.data.name);
+                }
             }
+            return response.data;
+        } catch (error) {
+            console.error('🔴 Client: Login Error:', error.response?.data || error.message);
+            throw error;
         }
-        return response.data;
     },
 
-    // Register
     register: async (username, email, password) => {
-        const response = await api.post('/auth/register', { name: username, email, password });
-        if (response.data.token) {
-            localStorage.setItem('token', response.data.token);
-            if (response.data.name) {
-                localStorage.setItem('userName', response.data.name);
+        console.log('🔵 Client: Sending Register Request...', { username, email });
+        try {
+            const response = await api.post('/auth/register', { name: username, email, password });
+            console.log('🟢 Client: Register Response:', response.data);
+
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+                if (response.data.name) {
+                    localStorage.setItem('userName', response.data.name);
+                }
             }
+            return response.data;
+        } catch (error) {
+            console.error('🔴 Client: Register Error:', error.response?.data || error.message);
+            throw error;
         }
-        return response.data;
     },
 
-    // Logout
     logout: () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userName');
     },
 
-    // Get current token
-    getToken: () => {
-        return localStorage.getItem('token');
-    },
-
-    // Get current user name
-    getUserName: () => {
-        return localStorage.getItem('userName') || 'User';
-    },
-
-    // Check if user is authenticated
-    isAuthenticated: () => {
-        return !!localStorage.getItem('token');
-    }
+    getToken: () => localStorage.getItem('token'),
+    getUserName: () => localStorage.getItem('userName') || 'User',
+    isAuthenticated: () => !!localStorage.getItem('token')
 };

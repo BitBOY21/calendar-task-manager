@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useTaskContext } from './context/TaskContext'; 
 import Sidebar from './components/layout/Sidebar';
 import TaskDrawer from './components/layout/TaskDrawer';
-import DashboardPage from './pages/DashboardPage'; // Updated path
-import WorkPage from './pages/WorkPage'; // Updated path
-import AnalyticsPage from './pages/AnalyticsPage'; // Updated path
-import HistoryPage from './pages/HistoryPage'; // Updated path
-import SettingsPage from './pages/SettingsPage'; // Updated path
+import DashboardPage from './pages/DashboardPage'; 
+import WorkPage from './pages/WorkPage'; 
+import AnalyticsPage from './pages/AnalyticsPage'; 
+import HistoryPage from './pages/HistoryPage'; 
+import SettingsPage from './pages/SettingsPage'; 
 import TaskForm from './features/tasks/components/TaskForm'; 
 import Login from './features/auth/Login';
 import { authService } from './services/authService';
@@ -18,7 +18,7 @@ function App() {
     const [user, setUser] = useState({ name: 'User' });
     const [currentView, setCurrentView] = useState('dashboard'); 
     
-    const { addTask, updateTask, deleteTask } = useTaskContext();
+    const { addTask, updateTask, deleteTask, fetchTasks } = useTaskContext();
 
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false); 
@@ -28,10 +28,18 @@ function App() {
     useEffect(() => {
         const savedToken = authService.getToken();
         if (savedToken) {
+            console.log('🔄 App: Found saved token, restoring session...');
             setToken(savedToken);
             setUser({ name: authService.getUserName() });
         }
     }, []);
+
+    useEffect(() => {
+        if (token) {
+            console.log('🔄 App: Token changed, fetching tasks...');
+            fetchTasks();
+        }
+    }, [token, fetchTasks]);
 
     const handleTaskClick = (task) => {
         setSelectedTask(task);
@@ -61,6 +69,7 @@ function App() {
     };
 
     const handleLogout = () => {
+        console.log('👋 App: Logging out...');
         authService.logout();
         setToken(null);
         setUser({ name: 'User' });
@@ -98,9 +107,17 @@ function App() {
         }
     };
 
-    if (!token) return <Login onLogin={(newToken) => {
-        setToken(newToken);
-        setUser({ name: authService.getUserName() });
+    if (!token) return <Login onLogin={(authData) => {
+        console.log('🔑 App: onLogin called with:', authData);
+        if (typeof authData === 'string') {
+            setToken(authData);
+            setUser({ name: authService.getUserName() });
+        } else {
+            setToken(authData.token);
+            setUser({ name: authData.name, email: authData.email });
+            localStorage.setItem('token', authData.token);
+            localStorage.setItem('userName', authData.name);
+        }
     }} />;
 
     return (

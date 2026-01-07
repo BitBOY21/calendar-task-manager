@@ -1,25 +1,30 @@
 const authService = require('../services/authService');
 const asyncHandler = require('../middleware/asyncHandler');
 
-/**
- * @desc    Register new user
- * @route   POST /api/auth/register
- */
 const registerUser = asyncHandler(async (req, res) => {
-    // Validation handled by middleware
+    console.log('🔶 Server: Register Request Received', req.body);
     const { name, email, password } = req.body;
-    const user = await authService.register({ name, email, password });
-    res.status(201).json(user);
+    try {
+        const user = await authService.register({ name, email, password });
+        console.log('🔷 Server: User Registered Successfully', user._id);
+        res.status(201).json(user);
+    } catch (error) {
+        res.status(400); // Bad Request
+        throw error;
+    }
 });
 
-/**
- * @desc    Authenticate a user (Login)
- * @route   POST /api/auth/login
- */
 const loginUser = asyncHandler(async (req, res) => {
+    console.log('🔶 Server: Login Request Received', req.body);
     const { email, password } = req.body;
-    const user = await authService.login(email, password);
-    res.json(user);
+    try {
+        const user = await authService.login(email, password);
+        console.log('🔷 Server: User Logged In Successfully', user._id);
+        res.json(user);
+    } catch (error) {
+        res.status(401); // Unauthorized
+        throw error;
+    }
 });
 
 module.exports = {

@@ -5,28 +5,32 @@ const Task = require('../models/Task');
 const { calculateUrgency } = require('./taskUtils');
 
 const seedData = async () => {
-    console.log('🌱 Seeding data with EXACT system tags (including emojis)...');
+    console.log('🌱 Seeding Demo User Data...');
 
-    // 1. Create or Find Test User
-    const email = 'test@example.com';
+    // 1. Create Demo User
+    const email = 'demo@example.com';
     let user = await User.findOne({ email });
 
     if (!user) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash('123456', salt);
         user = await User.create({
-            name: 'Test User',
+            name: 'Demo User',
             email,
             password: hashedPassword
         });
+        console.log('👤 Created user: demo@example.com / 123456');
+    } else {
+        console.log('👤 Found user: demo@example.com');
     }
 
-    // 2. Clear existing tasks
+    // 2. Clear existing tasks for this user
     await Task.deleteMany({ user: user._id });
 
     const tasks = [];
     const today = new Date();
     
+    // Helper functions
     const addDays = (date, days) => {
         const d = new Date(date);
         d.setDate(d.getDate() + days);
@@ -39,85 +43,115 @@ const seedData = async () => {
         return d;
     };
 
-    // --- EXACT System Tags from Frontend ---
-    const TAGS = {
-        WORK: "Work 💼",
-        PERSONAL: "Personal 🏠",
-        SHOPPING: "Shopping 🛒",
-        HEALTH: "Health 💪",
-        FINANCE: "Finance 💰",
-        STUDY: "Study 📚",
-        URGENT: "Urgent 🔥",
-        FAMILY: "Family 👨‍👩‍👧‍👦",
-        ERRANDS: "Errands 🏃"
-    };
+    // --- 1. Today's Tasks (The "Focus" List) ---
+    tasks.push(
+        {
+            title: "Morning Standup Meeting",
+            priority: "High",
+            tags: ["Work 💼", "Urgent 🔥"],
+            dueDate: setTime(today, 9, 0),
+            endDate: setTime(today, 9, 30),
+            isCompleted: true, // Already done
+            description: "Daily sync with the dev team."
+        },
+        {
+            title: "Review Project Proposal",
+            priority: "High",
+            tags: ["Work 💼"],
+            dueDate: setTime(today, 11, 0),
+            endDate: setTime(today, 12, 30),
+            isCompleted: false, // Urgent & Pending
+            subtasks: [
+                { text: "Read executive summary", isCompleted: true },
+                { text: "Add comments", isCompleted: false },
+                { text: "Send feedback email", isCompleted: false }
+            ]
+        },
+        {
+            title: "Lunch with Sarah",
+            priority: "Medium",
+            tags: ["Personal 🏠", "Social"],
+            dueDate: setTime(today, 13, 0),
+            endDate: setTime(today, 14, 0),
+            isCompleted: true,
+            location: "Italian Bistro"
+        },
+        {
+            title: "Finish React Component",
+            priority: "Medium",
+            tags: ["Work 💼", "Study 📚"],
+            dueDate: setTime(today, 15, 0),
+            endDate: setTime(today, 17, 0),
+            isCompleted: false
+        },
+        {
+            title: "Gym Workout",
+            priority: "Low",
+            tags: ["Health 💪"],
+            dueDate: setTime(today, 18, 30),
+            endDate: setTime(today, 20, 0),
+            isCompleted: false
+        }
+    );
 
-    // --- Templates with Correct Tags ---
-    const dailyTemplates = [
-        { title: "Morning Standup", priority: "High", tags: [TAGS.WORK, TAGS.URGENT], time: [9, 0], duration: 30 },
-        { title: "Gym Workout", priority: "Medium", tags: [TAGS.HEALTH, TAGS.PERSONAL], time: [17, 30], duration: 90 },
-        { title: "Grocery Shopping", priority: "Low", tags: [TAGS.SHOPPING, TAGS.PERSONAL], time: [18, 0], duration: 45 },
-        { title: "Pay Monthly Bills", priority: "High", tags: [TAGS.FINANCE, TAGS.URGENT], time: [11, 0], duration: 20 },
-        { title: "Study React Patterns", priority: "Medium", tags: [TAGS.STUDY], time: [20, 0], duration: 60 },
-        { title: "Call Family", priority: "Low", tags: [TAGS.FAMILY, TAGS.PERSONAL], time: [19, 0], duration: 30 },
-        { title: "Quick Errand", priority: "Low", tags: [TAGS.ERRANDS], time: [14, 0], duration: 20 }
-    ];
+    // --- 2. Upcoming Tasks (This Week) ---
+    tasks.push(
+        {
+            title: "Grocery Shopping",
+            priority: "Medium",
+            tags: ["Shopping 🛒", "Errands 🏃"],
+            dueDate: setTime(addDays(today, 1), 17, 0),
+            isCompleted: false
+        },
+        {
+            title: "Dentist Appointment",
+            priority: "High",
+            tags: ["Health 💪", "Urgent 🔥"],
+            dueDate: setTime(addDays(today, 2), 10, 0),
+            location: "City Dental Clinic",
+            isCompleted: false
+        },
+        {
+            title: "Submit Tax Report",
+            priority: "High",
+            tags: ["Finance 💰"],
+            dueDate: setTime(addDays(today, 3), 9, 0),
+            isCompleted: false
+        },
+        {
+            title: "Weekend Trip Planning",
+            priority: "Low",
+            tags: ["Family 👨‍👩‍👧‍👦", "Personal 🏠"],
+            dueDate: setTime(addDays(today, 4), 20, 0),
+            isCompleted: false
+        }
+    );
 
-    const multiDayTemplates = [
-        { title: "Project Milestone: Alpha", tags: [TAGS.WORK, TAGS.URGENT], priority: "High", days: 4 },
-        { title: "Home Organization", tags: [TAGS.PERSONAL, TAGS.HOME], priority: "Medium", days: 3 },
-        { title: "Learning Week: AI", tags: [TAGS.STUDY, TAGS.WORK], priority: "Medium", days: 5 }
-    ];
-
-    // 3. Generate Multi-day Tasks
-    for (let i = -20; i <= 20; i += 15) {
-        const template = multiDayTemplates[Math.floor(Math.random() * multiDayTemplates.length)];
-        const startDate = addDays(today, i);
-        const endDate = addDays(startDate, template.days);
+    // --- 3. Past Tasks (History & Stats) ---
+    // Generate 15 random past tasks
+    for (let i = 1; i <= 15; i++) {
+        const isCompleted = Math.random() > 0.2; // 80% completion rate
+        const priority = Math.random() > 0.7 ? "High" : (Math.random() > 0.4 ? "Medium" : "Low");
         
         tasks.push({
-            user: user._id,
-            title: template.title,
-            priority: template.priority,
-            tags: template.tags,
-            dueDate: setTime(startDate, 9, 0),
-            endDate: setTime(endDate, 17, 0),
-            isCompleted: i < 0,
-            urgencyScore: calculateUrgency(startDate, template.priority),
-            description: "Multi-day project with system tags."
+            title: `Past Task ${i}`,
+            priority: priority,
+            tags: ["Work 💼", "Personal 🏠"],
+            dueDate: setTime(addDays(today, -i), 10, 0),
+            isCompleted: isCompleted,
+            description: "Auto-generated history task."
         });
     }
 
-    // 4. Generate Daily Tasks (-30 to +30)
-    for (let i = -30; i <= 30; i++) {
-        const date = addDays(today, i);
-        const isWeekend = date.getDay() === 5 || date.getDay() === 6;
-        const dailyCount = isWeekend ? 2 : 4;
+    // Add user ID and calculate urgency for all
+    const finalTasks = tasks.map(t => ({
+        ...t,
+        user: user._id,
+        urgencyScore: calculateUrgency(t.dueDate, t.priority)
+    }));
 
-        for (let j = 0; j < dailyCount; j++) {
-            const template = dailyTemplates[Math.floor(Math.random() * dailyTemplates.length)];
-            
-            const hourOffset = Math.floor(Math.random() * 3) - 1; 
-            const startTime = setTime(date, template.time[0] + hourOffset, template.time[1]);
-            const endTime = new Date(startTime.getTime() + template.duration * 60000);
-
-            tasks.push({
-                user: user._id,
-                title: template.title,
-                priority: template.priority,
-                tags: template.tags,
-                dueDate: startTime,
-                endDate: endTime,
-                isCompleted: i < 0 ? Math.random() > 0.15 : false,
-                urgencyScore: calculateUrgency(startTime, template.priority),
-                order: j,
-                subtasks: [{ text: "Initial Step", isCompleted: i < 0 }]
-            });
-        }
-    }
-
-    await Task.insertMany(tasks);
-    console.log(`✅ Seeded ${tasks.length} tasks with EXACT system tags (emojis included).`);
+    await Task.insertMany(finalTasks);
+    console.log(`✅ Seeded ${finalTasks.length} tasks successfully!`);
 };
 
 module.exports = seedData;

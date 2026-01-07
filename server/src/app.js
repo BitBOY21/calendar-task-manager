@@ -2,9 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
-const helmet = require('helmet');
-// const mongoSanitize = require('express-mongo-sanitize'); // Removed due to incompatibility
-const xss = require('xss-clean');
+// const helmet = require('helmet'); // Removed due to Express 5 incompatibility
+// const mongoSanitize = require('express-mongo-sanitize'); // Removed due to Express 5 incompatibility
+// const xss = require('xss-clean'); // Removed due to Express 5 incompatibility
 const connectDB = require('./config/db');
 const { errorHandler } = require('./middleware/errorMiddleware');
 
@@ -21,9 +21,8 @@ app.use(cors()); // Allow all origins
 app.use(express.json());
 
 // --- Security Middleware ---
-app.use(helmet()); // Set security headers
-// app.use(mongoSanitize()); // DISABLED
-app.use(xss()); // Prevent XSS attacks
+// All security middleware disabled for now due to Express 5 breaking changes
+// In production, consider downgrading to Express 4 or finding compatible alternatives
 
 // Logging Middleware (Only in development)
 if (process.env.NODE_ENV === 'development') {
