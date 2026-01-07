@@ -115,12 +115,14 @@ const WorkPage = ({ onDateSelect, onEventDrop, onEventClick }) => {
 
                 <div style={styles.tasksSection}>
                     <h3 style={styles.listTitle}>Tasks ({filteredTasks.length})</h3>
-                    <TaskList 
-                        tasks={filteredTasks} 
-                        onUpdate={updateTask}
-                        onDelete={deleteTask}
-                        onDragEnd={() => {}} 
-                    />
+                    <div style={styles.taskListWrapper}>
+                        <TaskList 
+                            tasks={filteredTasks} 
+                            onUpdate={updateTask}
+                            onDelete={deleteTask}
+                            onDragEnd={() => {}} 
+                        />
+                    </div>
                 </div>
             </Card>
 
@@ -164,7 +166,7 @@ const styles = {
     sidebarArea: { 
         flex: 1, 
         minWidth: '320px',
-        maxWidth: '400px',
+        maxWidth: '450px', // Increased width
         display: 'flex', 
         flexDirection: 'column', 
         overflow: 'hidden',
@@ -187,15 +189,25 @@ const styles = {
     
     tasksSection: {
         flex: 1,
-        overflowY: 'auto',
-        padding: '20px'
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden', // Prevent double scrollbar
+        padding: '20px',
+        paddingBottom: '0' // Remove bottom padding to let list scroll to edge
     },
 
     listTitle: {
         margin: '0 0 15px 0',
         fontSize: '1.1rem',
         color: '#333',
-        fontWeight: '700'
+        fontWeight: '700',
+        flexShrink: 0 // Prevent title from shrinking
+    },
+
+    taskListWrapper: {
+        flex: 1,
+        overflowY: 'auto',
+        paddingRight: '5px' // Space for scrollbar
     }
 };
 

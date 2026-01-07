@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { taskService } from '../../../services/taskService';
-import { FaTimes, FaMagic, FaTrash, FaMapMarkerAlt, FaClock, FaCalendarAlt, FaTag } from 'react-icons/fa';
+import { FaTimes, FaMagic, FaTrash, FaMapMarkerAlt, FaClock, FaCalendarAlt, FaTag, FaChevronDown } from 'react-icons/fa';
 
 const TAG_OPTIONS = [
     "Work 💼", "Personal 🏠", "Shopping 🛒", "Health 💪", "Finance 💰",
@@ -12,6 +12,8 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
     const [desc, setDesc] = useState('');
     const [priority, setPriority] = useState('Medium');
     const [dateStr, setDateStr] = useState('');
+    const [endDateStr, setEndDateStr] = useState('');
+    const [showEndDate, setShowEndDate] = useState(false);
     const [timeStr, setTimeStr] = useState('');
     const [endTimeStr, setEndTimeStr] = useState('');
     const [showEndTime, setShowEndTime] = useState(false);
@@ -20,6 +22,9 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
     const [loadingAI, setLoadingAI] = useState(false);
     const [manualStep, setManualStep] = useState('');
     const [tags, setTags] = useState([]);
+    
+    const [isTagsDropdownOpen, setIsTagsDropdownOpen] = useState(false);
+    const tagsDropdownRef = useRef(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -38,6 +43,16 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
                 }
                 if (taskToEdit.endDate) {
                     const d = new Date(taskToEdit.endDate);
+                    
+                    // Check if end date is different from start date
+                    const startDate = new Date(taskToEdit.dueDate);
+                    const isSameDay = d.toDateString() === startDate.toDateString();
+                    
+                    if (!isSameDay) {
+                        setEndDateStr(d.toISOString().slice(0, 10));
+                        setShowEndDate(true);
+                    }
+                    
                     setEndTimeStr(d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
                     setShowEndTime(true);
                 }
@@ -49,9 +64,22 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
         }
     }, [isOpen, taskToEdit, initialDate]);
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (tagsDropdownRef.current && !tagsDropdownRef.current.contains(event.target)) {
+                setIsTagsDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
     const resetForm = () => {
         setTitle(''); setDesc(''); setLocation(''); setTags([]);
         setTimeStr(''); setEndTimeStr(''); setShowEndTime(false);
+        setDateStr(''); setEndDateStr(''); setShowEndDate(false);
         setPriority('Medium'); setSubtasks([]); setManualStep('');
     };
 
@@ -76,7 +104,15 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
         if (!title.trim()) return;
 
         const finalStartDate = combineDateTime(dateStr, timeStr);
-        const finalEndDate = showEndTime ? combineDateTime(dateStr, endTimeStr) : null;
+        let finalEndDate = null;
+        
+        if (showEndDate && endDateStr) {
+             // Explicit end date
+             finalEndDate = combineDateTime(endDateStr, endTimeStr || '23:59');
+        } else if (showEndTime && endTimeStr) {
+            // Same day end time
+            finalEndDate = combineDateTime(dateStr, endTimeStr);
+        }
 
         const taskData = {
             title, description: desc, location, tags, priority,
@@ -89,10 +125,12 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
         onClose();
     };
 
-    const handleSelectTag = (e) => {
-        const val = e.target.value;
-        if (val && !tags.includes(val)) setTags([...tags, val]);
-        e.target.value = "";
+    const handleTagToggle = (tag) => {
+        if (tags.includes(tag)) {
+            setTags(tags.filter(t => t !== tag));
+        } else {
+            setTags([...tags, tag]);
+        }
     };
 
     const addManualStep = () => {
@@ -107,27 +145,28 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
         <div style={styles.overlay} onClick={onClose}>
             <div style={styles.modal} onClick={e => e.stopPropagation()}>
                 
-                {/* Header */}
-                <div style={styles.header}>
-                    <h2 style={styles.title}>{taskToEdit ? '✏️ Edit Task' : '✨ New Task'}</h2>
-                    <div style={styles.actions}>
-                        {taskToEdit && (
-                            <button onClick={() => { if(window.confirm('Delete?')) { onDelete(taskToEdit._id); onClose(); }}} style={styles.iconBtn} title="Delete">
-                                <FaTrash color="#dc3545" />
-                            </button>
-                        )}
-                        <button onClick={onClose} style={styles.iconBtn}><FaTimes /></button>
-                    </div>
-                </div>
-
+                {/* Removed Header Title, moved actions to input row */}
+                
                 <form onSubmit={handleSubmit} style={styles.form}>
                     
-                    {/* Main Inputs */}
-                    <input
-                        type="text" placeholder="What needs to be done?"
-                        value={title} onChange={(e) => setTitle(e.target.value)}
-                        style={styles.mainInput} autoFocus
-                    />
+                    {/* Main Input Row with Actions */}
+                    <div style={styles.inputRow}>
+                        <input
+                            type="text" placeholder="Enter new task..."
+                            value={title} onChange={(e) => setTitle(e.target.value)}
+                            style={styles.mainInput} autoFocus
+                        />
+                        
+                        <div style={styles.actions}>
+                            {taskToEdit && (
+                                <button type="button" onClick={() => { if(window.confirm('Delete?')) { onDelete(taskToEdit._id); onClose(); }}} style={styles.iconBtn} title="Delete">
+                                    <FaTrash color="#dc3545" />
+                                </button>
+                            )}
+                            <button type="button" onClick={onClose} style={styles.iconBtn}><FaTimes /></button>
+                        </div>
+                    </div>
+
                     <textarea
                         placeholder="Add details..."
                         value={desc} onChange={(e) => setDesc(e.target.value)}
@@ -138,7 +177,17 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
                     <div style={styles.grid}>
                         <div style={styles.field}>
                             <label style={styles.label}><FaCalendarAlt /> Date</label>
-                            <input type="date" value={dateStr} onChange={e => setDateStr(e.target.value)} style={styles.input} />
+                            <div style={styles.timeRow}>
+                                <input type="date" value={dateStr} onChange={e => setDateStr(e.target.value)} style={styles.input} />
+                                {!showEndDate ? (
+                                    <button type="button" onClick={() => setShowEndDate(true)} style={styles.linkBtn}>+ End Date</button>
+                                ) : (
+                                    <>
+                                        <span style={{color:'#999'}}>to</span>
+                                        <input type="date" value={endDateStr} onChange={e => setEndDateStr(e.target.value)} style={styles.input} />
+                                    </>
+                                )}
+                            </div>
                         </div>
                         <div style={styles.field}>
                             <label style={styles.label}><FaClock /> Time</label>
@@ -176,16 +225,44 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
                         </div>
                         <div style={styles.field}>
                             <label style={styles.label}><FaTag /> Tags</label>
-                            <select onChange={handleSelectTag} style={styles.select}>
-                                <option value="" disabled selected>+ Add Tag</option>
-                                {TAG_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                            </select>
-                            <div style={styles.tagsWrapper}>
-                                {tags.map(tag => (
-                                    <span key={tag} style={styles.tag}>
-                                        {tag} <span onClick={() => setTags(tags.filter(t => t !== tag))} style={styles.removeTag}>×</span>
-                                    </span>
-                                ))}
+                            <div style={{ position: 'relative', width: '100%' }} ref={tagsDropdownRef}>
+                                <button 
+                                    type="button"
+                                    onClick={() => setIsTagsDropdownOpen(!isTagsDropdownOpen)}
+                                    style={styles.multiSelectBtn}
+                                >
+                                    {tags.length > 0 
+                                        ? `${tags.length} Selected` 
+                                        : 'Select Tags'}
+                                    <FaChevronDown size={12} color="#666" />
+                                </button>
+                                
+                                {isTagsDropdownOpen && (
+                                    <div style={styles.dropdownMenu}>
+                                        {TAG_OPTIONS.map(tag => {
+                                            const isActive = tags.includes(tag);
+                                            return (
+                                                <div 
+                                                    key={tag} 
+                                                    onClick={() => handleTagToggle(tag)}
+                                                    style={{
+                                                        ...styles.dropdownItem,
+                                                        backgroundColor: isActive ? '#e3f2fd' : 'white',
+                                                        color: isActive ? '#1565c0' : '#333'
+                                                    }}
+                                                >
+                                                    <input 
+                                                        type="checkbox" 
+                                                        checked={isActive} 
+                                                        readOnly 
+                                                        style={{ marginRight: '8px', cursor: 'pointer' }}
+                                                    />
+                                                    {tag}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -230,13 +307,14 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
 const styles = {
     overlay: { position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 },
     modal: { backgroundColor: '#fff', width: '550px', maxWidth: '95%', borderRadius: '16px', padding: '24px', boxShadow: '0 10px 40px rgba(0,0,0,0.2)', maxHeight: '90vh', overflowY: 'auto' },
-    header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' },
-    title: { margin: 0, fontSize: '1.4rem', fontWeight: '700', color: '#333' },
-    actions: { display: 'flex', gap: '10px' },
-    iconBtn: { background: 'none', border: 'none', fontSize: '1.1rem', cursor: 'pointer', color: '#666', padding: '5px', borderRadius: '50%', transition: 'background 0.2s' },
     
     form: { display: 'flex', flexDirection: 'column', gap: '16px' },
-    mainInput: { fontSize: '1.2rem', border: 'none', borderBottom: '2px solid #eee', padding: '8px 0', outline: 'none', fontWeight: '600', width: '100%' },
+    
+    inputRow: { display: 'flex', alignItems: 'center', gap: '10px', width: '100%' },
+    mainInput: { flex: 1, fontSize: '1.1rem', border: '1px solid #eee', borderRadius: '8px', padding: '10px 12px', outline: 'none', fontWeight: '600', boxSizing: 'border-box' },
+    actions: { display: 'flex', gap: '5px', flexShrink: 0 },
+    iconBtn: { background: 'none', border: 'none', fontSize: '1.1rem', cursor: 'pointer', color: '#666', padding: '5px', borderRadius: '50%', transition: 'background 0.2s' },
+
     descInput: { border: '1px solid #eee', borderRadius: '8px', padding: '10px', fontSize: '0.95rem', resize: 'none', outline: 'none', transition: 'border 0.2s' },
     
     grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' },
@@ -252,8 +330,44 @@ const styles = {
     pillMedium: { backgroundColor: '#ffc107', color: '#333' },
     pillHigh: { backgroundColor: '#dc3545', color: 'white' },
 
-    select: { padding: '6px', borderRadius: '6px', border: '1px solid #eee', fontSize: '0.85rem' },
-    tagsWrapper: { display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' },
+    multiSelectBtn: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        padding: '8px 12px',
+        borderRadius: '8px',
+        border: '1px solid #eee',
+        backgroundColor: 'white',
+        cursor: 'pointer',
+        fontSize: '0.9rem',
+        color: '#555',
+        boxSizing: 'border-box'
+    },
+    dropdownMenu: {
+        position: 'absolute',
+        top: '100%',
+        left: 0,
+        width: '100%',
+        maxHeight: '200px',
+        overflowY: 'auto',
+        backgroundColor: 'white',
+        border: '1px solid #ddd',
+        borderRadius: '6px',
+        marginTop: '4px',
+        zIndex: 1000,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+    },
+    dropdownItem: {
+        padding: '8px 12px',
+        cursor: 'pointer',
+        fontSize: '0.9rem',
+        display: 'flex',
+        alignItems: 'center',
+        borderBottom: '1px solid #f0f0f0'
+    },
+
+    tagsWrapper: { display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }, // Kept for backward compatibility if needed, though tags are now in dropdown
     tag: { backgroundColor: '#e3f2fd', color: '#1565c0', padding: '2px 8px', borderRadius: '12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' },
     removeTag: { cursor: 'pointer', fontWeight: 'bold' },
 
