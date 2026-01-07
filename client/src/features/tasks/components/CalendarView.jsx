@@ -28,21 +28,26 @@ const MiniMonth = ({ month, events, onView, onNavigate }) => {
     
     const startDay = getDay(startOfMonth(month)); // 0 for Sunday
     
-    const handleMonthClick = () => {
+    const handleMonthClick = (e) => {
+        e.stopPropagation(); 
         onNavigate(month);
         onView('month');
     };
 
-    const handleDayClick = (day) => {
+    const handleDayClick = (day, e) => {
+        e.stopPropagation(); 
         onNavigate(day);
         onView('day');
     };
 
     return (
-        <div style={{ border: '1px solid #f0f0f0', borderRadius: '12px', padding: '10px', display: 'flex', flexDirection: 'column', backgroundColor: '#fff' }}>
+        <div 
+            onClick={handleMonthClick}
+            style={{ border: '1px solid #f0f0f0', borderRadius: '12px', padding: '10px', display: 'flex', flexDirection: 'column', backgroundColor: '#fff', cursor: 'pointer', transition: 'all 0.2s ease' }}
+            className="mini-month-hover"
+        >
             <div 
-                onClick={handleMonthClick}
-                style={{ fontWeight: '700', textAlign: 'center', marginBottom: '10px', cursor: 'pointer', color: '#333', fontSize: '0.9rem' }}
+                style={{ fontWeight: '700', textAlign: 'center', marginBottom: '10px', color: '#333', fontSize: '0.9rem' }}
             >
                 {format(month, 'MMMM')}
             </div>
@@ -56,8 +61,8 @@ const MiniMonth = ({ month, events, onView, onNavigate }) => {
                     const isToday = isSameDay(day, new Date());
                     return (
                         <div 
-                            key={day.toString()} 
-                            onClick={() => handleDayClick(day)}
+                            key={format(day, 'yyyy-MM-dd')} 
+                            onClick={(e) => handleDayClick(day, e)}
                             style={{ 
                                 textAlign: 'center', 
                                 cursor: 'pointer', 
@@ -87,10 +92,10 @@ const YearView = ({ date, events, onView, onNavigate }) => {
     });
 
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px', height: '100%', overflowY: 'auto', padding: '10px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px', height: '100%', overflowY: 'auto', padding: '10px' }}>
             {months.map((month, idx) => (
                 <MiniMonth 
-                    key={idx} 
+                    key={format(month, 'yyyy-MM')}
                     month={month} 
                     events={events} 
                     onView={onView}
@@ -282,6 +287,15 @@ const CalendarView = ({ tasks, onDateSelect, onEventDrop, onEventClick, unified 
     const CalendarWrapper = unified ? 'div' : Card;
     const wrapperProps = unified ? { style: styles.calendarWrapperUnified } : { style: { height: '100%', display: 'flex', flexDirection: 'column', padding: '20px' } };
 
+    // --- Fix: Handle navigation correctly ---
+    const handleNavigate = (newDate) => {
+        setDate(newDate);
+    };
+
+    const handleViewChange = (newView) => {
+        setView(newView);
+    };
+
     return (
         <CalendarWrapper {...wrapperProps}>
             <DnDCalendar
@@ -289,9 +303,9 @@ const CalendarView = ({ tasks, onDateSelect, onEventDrop, onEventClick, unified 
                 events={events}
                 defaultView={Views.MONTH}
                 view={view}
-                onView={setView}
+                onView={handleViewChange}
                 date={date}
-                onNavigate={setDate}
+                onNavigate={handleNavigate}
                 popup={true} // Show "Show more" popup on overflow
                 views={views} // Pass custom views
 
