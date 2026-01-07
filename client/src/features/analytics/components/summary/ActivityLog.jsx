@@ -5,12 +5,18 @@ const ActivityLog = ({ tasks }) => {
     const recentActivity = tasks
         .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
         .slice(0, 10)
-        .map(t => ({
-            id: t._id,
-            action: t.isCompleted ? 'Completed' : 'Created',
-            taskTitle: t.title,
-            time: new Date(t.updatedAt || t.createdAt).toLocaleDateString('en-GB')
-        }));
+        .map(t => {
+            const date = new Date(t.updatedAt || t.createdAt);
+            const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const formattedTime = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+            
+            return {
+                id: t._id,
+                action: t.isCompleted ? 'Completed' : 'Created',
+                taskTitle: t.title,
+                time: `${formattedDate}, ${formattedTime}`
+            };
+        });
 
     return (
         <Card style={{ padding: '25px', marginBottom: '20px' }}>

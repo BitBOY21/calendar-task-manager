@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTaskContext } from '../context/TaskContext'; 
 import TaskFilters from '../features/tasks/components/TaskFilters'; 
 import TaskForm from '../features/tasks/components/TaskForm'; 
@@ -21,30 +21,32 @@ const AnalyticsPage = ({ user }) => {
     
     const [editingTask, setEditingTask] = useState(null); 
 
-    const filteredTasks = tasks
-        .filter(task => {
-            if (filter === 'Completed' && !task.isCompleted) return false;
-            if (filter === 'Pending' && task.isCompleted) return false;
-            if (filter === 'High Priority' && task.priority !== 'High') return false;
-            if (priorityFilter !== 'all' && task.priority !== priorityFilter) return false;
-            if (activeTags.length > 0) {
-                const hasTag = task.tags && task.tags.some(t => activeTags.includes(t));
-                if (!hasTag) return false;
-            }
-            if (searchTerm && !task.title.toLowerCase().includes(searchTerm.toLowerCase())) return false;
-            return true;
-        })
-        .sort((a, b) => {
-            switch (sortBy) {
-                case 'date_desc': return new Date(b.dueDate || 0) - new Date(a.dueDate || 0);
-                case 'date_asc': return new Date(a.dueDate || 0) - new Date(b.dueDate || 0);
-                case 'priority': 
-                    const pMap = { 'High': 3, 'Medium': 2, 'Low': 1 };
-                    return pMap[b.priority] - pMap[a.priority];
-                case 'name': return a.title.localeCompare(b.title);
-                default: return 0;
-            }
-        });
+    const filteredTasks = useMemo(() => {
+        return tasks
+            .filter(task => {
+                if (filter === 'Completed' && !task.isCompleted) return false;
+                if (filter === 'Pending' && task.isCompleted) return false;
+                if (filter === 'High Priority' && task.priority !== 'High') return false;
+                if (priorityFilter !== 'all' && task.priority !== priorityFilter) return false;
+                if (activeTags.length > 0) {
+                    const hasTag = task.tags && task.tags.some(t => activeTags.includes(t));
+                    if (!hasTag) return false;
+                }
+                if (searchTerm && !task.title.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+                return true;
+            })
+            .sort((a, b) => {
+                switch (sortBy) {
+                    case 'date_desc': return new Date(b.dueDate || 0) - new Date(a.dueDate || 0);
+                    case 'date_asc': return new Date(a.dueDate || 0) - new Date(b.dueDate || 0);
+                    case 'priority': 
+                        const pMap = { 'High': 3, 'Medium': 2, 'Low': 1 };
+                        return pMap[b.priority] - pMap[a.priority];
+                    case 'name': return a.title.localeCompare(b.title);
+                    default: return 0;
+                }
+            });
+    }, [tasks, filter, priorityFilter, activeTags, searchTerm, sortBy]);
 
     const toggleTag = (tag) => {
         setActiveTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
@@ -162,7 +164,7 @@ const AnalyticsPage = ({ user }) => {
 };
 
 const styles = {
-    container: { padding: '30px', maxWidth: '1200px', margin: '0 auto', paddingBottom: '60px', height: '100%', overflowY: 'auto' }, // Removed backgroundColor
+    container: { padding: '30px', maxWidth: '1200px', margin: '0 auto', paddingBottom: '60px', height: '100%', overflowY: 'auto' }, // Transparent background
     header: { marginBottom: '25px', textAlign: 'center' },
     subtitle: { color: '#666', fontSize: '1.1rem', fontWeight: '400' },
     
