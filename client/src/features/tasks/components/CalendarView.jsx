@@ -1,7 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
-import { format, parse, startOfWeek, getDay, addHours, startOfDay, endOfDay, addDays } from 'date-fns';
+import { 
+    format, parse, startOfWeek, getDay, addHours, startOfDay, endOfDay, addDays,
+    startOfYear, endOfYear, addYears, eachMonthOfInterval, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay 
+} from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import Card from '../../../components/ui/Card'; // Import Card component
 
@@ -15,6 +18,105 @@ const localizer = dateFnsLocalizer({
 
 const DnDCalendar = withDragAndDrop(Calendar);
 
+// --- Year View Components ---
+
+const MiniMonth = ({ month, events, onView, onNavigate }) => {
+    const days = eachDayOfInterval({
+        start: startOfMonth(month),
+        end: endOfMonth(month)
+    });
+    
+    const startDay = getDay(startOfMonth(month)); // 0 for Sunday
+    
+    const handleMonthClick = () => {
+        onNavigate(month);
+        onView('month');
+    };
+
+    const handleDayClick = (day) => {
+        onNavigate(day);
+        onView('day');
+    };
+
+    return (
+        <div style={{ border: '1px solid #f0f0f0', borderRadius: '12px', padding: '10px', display: 'flex', flexDirection: 'column', backgroundColor: '#fff' }}>
+            <div 
+                onClick={handleMonthClick}
+                style={{ fontWeight: '700', textAlign: 'center', marginBottom: '10px', cursor: 'pointer', color: '#333', fontSize: '0.9rem' }}
+            >
+                {format(month, 'MMMM')}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', fontSize: '0.75rem' }}>
+                {['S','M','T','W','T','F','S'].map(d => <div key={d} style={{ textAlign: 'center', color: '#999', fontWeight: '600', marginBottom: '4px' }}>{d}</div>)}
+                
+                {Array(startDay).fill(null).map((_, i) => <div key={`empty-${i}`} />)}
+                
+                {days.map(day => {
+                    const hasEvent = events.some(e => isSameDay(e.start, day));
+                    const isToday = isSameDay(day, new Date());
+                    return (
+                        <div 
+                            key={day.toString()} 
+                            onClick={() => handleDayClick(day)}
+                            style={{ 
+                                textAlign: 'center', 
+                                cursor: 'pointer', 
+                                borderRadius: '50%', 
+                                width: '24px', 
+                                height: '24px', 
+                                lineHeight: '24px',
+                                backgroundColor: isToday ? '#007bff' : (hasEvent ? '#e3f2fd' : 'transparent'),
+                                color: isToday ? 'white' : (hasEvent ? '#007bff' : '#333'),
+                                fontWeight: (isToday || hasEvent) ? 'bold' : 'normal',
+                                margin: '0 auto'
+                            }}
+                        >
+                            {format(day, 'd')}
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+};
+
+const YearView = ({ date, events, onView, onNavigate }) => {
+    const months = eachMonthOfInterval({
+        start: startOfYear(date),
+        end: endOfYear(date)
+    });
+
+    return (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px', height: '100%', overflowY: 'auto', padding: '10px' }}>
+            {months.map((month, idx) => (
+                <MiniMonth 
+                    key={idx} 
+                    month={month} 
+                    events={events} 
+                    onView={onView}
+                    onNavigate={onNavigate}
+                />
+            ))}
+        </div>
+    );
+};
+
+YearView.range = date => {
+    return [startOfYear(date), endOfYear(date)];
+};
+
+YearView.navigate = (date, action) => {
+    if (action === 'PREV') return addYears(date, -1);
+    if (action === 'NEXT') return addYears(date, 1);
+    return date;
+};
+
+YearView.title = (date, { localizer }) => {
+    return localizer.format(date, 'yyyy');
+};
+
+// --- Toolbar ---
+
 const CustomToolbar = (toolbar) => {
     const goToBack = () => toolbar.onNavigate('PREV');
     const goToNext = () => toolbar.onNavigate('NEXT');
@@ -23,6 +125,7 @@ const CustomToolbar = (toolbar) => {
     const goToMonth = () => toolbar.onView('month');
     const goToWeek = () => toolbar.onView('week');
     const goToDay = () => toolbar.onView('day');
+    const goToYear = () => toolbar.onView('year');
 
     const label = () => (
         <span style={{ 
@@ -48,6 +151,7 @@ const CustomToolbar = (toolbar) => {
             <div style={styles.labelContainer}>{label()}</div>
 
             <div style={styles.viewGroup}>
+                <button onClick={goToYear} style={toolbar.view === 'year' ? styles.activeViewBtn : styles.viewBtn}>Year</button>
                 <button onClick={goToMonth} style={toolbar.view === 'month' ? styles.activeViewBtn : styles.viewBtn}>Month</button>
                 <button onClick={goToWeek} style={toolbar.view === 'week' ? styles.activeViewBtn : styles.viewBtn}>Week</button>
                 <button onClick={goToDay} style={toolbar.view === 'day' ? styles.activeViewBtn : styles.viewBtn}>Day</button>
@@ -60,12 +164,22 @@ const CalendarView = ({ tasks, onDateSelect, onEventDrop, onEventClick, unified 
     const [view, setView] = useState(Views.MONTH);
     const [date, setDate] = useState(new Date());
 
+    // Define views configuration
+    const { views } = useMemo(() => ({
+        views: {
+            month: true,
+            week: true,
+            day: true,
+            year: YearView
+        }
+    }), []);
+
     // --- Smart scroll point calculation (Smart Scroll) ---
     const scrollTime = useMemo(() => {
         // Default: 08:00 in the morning
         const defaultTime = new Date(1970, 1, 1, 8, 0, 0);
 
-        if (view === Views.MONTH) return defaultTime;
+        if (view === Views.MONTH || view === 'year') return defaultTime;
 
         // 1. Define date range for checking (current day or current week)
         let startRange, endRange;
@@ -178,12 +292,23 @@ const CalendarView = ({ tasks, onDateSelect, onEventDrop, onEventClick, unified 
                 onView={setView}
                 date={date}
                 onNavigate={setDate}
+                popup={true} // Show "Show more" popup on overflow
+                views={views} // Pass custom views
 
                 // Here's the magic: smart automatic scrolling
                 scrollToTime={scrollTime}
 
                 eventPropGetter={eventStyleGetter}
-                components={{ toolbar: CustomToolbar }}
+                components={{ 
+                    toolbar: CustomToolbar,
+                    month: {
+                        dateHeader: ({ label }) => (
+                            <div style={{ textAlign: 'center', fontWeight: '600', color: '#555' }}>
+                                {label}
+                            </div>
+                        )
+                    }
+                }}
                 style={{ height: '100%', backgroundColor: 'white' }} // Ensure white bg for calendar itself
 
                 selectable={true}

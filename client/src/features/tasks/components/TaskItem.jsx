@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaCheck, FaClock, FaMapMarkerAlt, FaEdit, FaTrash, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaCheck, FaClock, FaMapMarkerAlt, FaEdit, FaTrash, FaChevronDown, FaChevronUp, FaCalendarAlt } from 'react-icons/fa';
 
 // Same tags as in the form
 const TAG_OPTIONS = ["Work 💼", "Personal 🏠", "Shopping 🛒", "Health 💪", "Finance 💰", "Study 📚", "Urgent 🔥", "Family 👨‍👩‍👧‍👦", "Errands 🏃"];
@@ -8,6 +8,7 @@ const TaskItem = ({ task, onDelete, onUpdate }) => {
     const [localSubtasks, setLocalSubtasks] = useState(task.subtasks || []);
     const [isExpanded, setIsExpanded] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [isHoveringCheck, setIsHoveringCheck] = useState(false);
     
     // Edit Fields
     const [editTitle, setEditTitle] = useState(task.title);
@@ -111,16 +112,16 @@ const TaskItem = ({ task, onDelete, onUpdate }) => {
         setEditTags(editTags.filter(t => t !== tagToRemove));
     };
 
+    // Updated colors to match TaskFilters
     const getPriorityColor = (p) => {
-        if (p === 'High') return '#ffebee';
-        if (p === 'Medium') return '#fff3e0';
-        return '#e8f5e9';
+        if (p === 'High') return '#ff4d4d'; // Red
+        if (p === 'Medium') return '#ffad33'; // Orange/Yellow
+        if (p === 'Low') return '#28a745'; // Green
+        return '#6c757d';
     };
     
     const getPriorityTextColor = (p) => {
-        if (p === 'High') return '#c62828';
-        if (p === 'Medium') return '#ef6c00';
-        return '#2e7d32';
+        return 'white'; // White text for better contrast with vibrant colors
     };
 
     const completedCount = localSubtasks.filter(s => s.isCompleted).length;
@@ -168,20 +169,25 @@ const TaskItem = ({ task, onDelete, onUpdate }) => {
         );
     }
 
-    // --- Render View Mode (New Design) ---
+    // --- Render View Mode (Compact Design) ---
     return (
         <div style={styles.taskRow} className="task-row-hover">
             {/* 1. Check Circle */}
             <div 
                 onClick={handleQuickComplete}
+                onMouseEnter={() => setIsHoveringCheck(true)}
+                onMouseLeave={() => setIsHoveringCheck(false)}
                 style={{
                     ...styles.checkCircle,
-                    borderColor: task.isCompleted ? '#28a745' : '#ddd',
+                    borderColor: task.isCompleted ? '#28a745' : (isHoveringCheck ? '#28a745' : '#ddd'),
                     backgroundColor: task.isCompleted ? '#28a745' : 'transparent',
                 }}
                 title={task.isCompleted ? "Mark as Incomplete" : "Mark as Done"}
             >
-                <FaCheck style={{...styles.checkIcon, color: task.isCompleted ? 'white' : 'transparent'}} />
+                <FaCheck style={{
+                    ...styles.checkIcon, 
+                    color: task.isCompleted ? 'white' : (isHoveringCheck ? '#28a745' : 'transparent')
+                }} />
             </div>
 
             {/* 2. Task Info */}
@@ -196,20 +202,21 @@ const TaskItem = ({ task, onDelete, onUpdate }) => {
                 
                 <div style={styles.taskMeta}>
                     {task.dueDate && (
-                        <span style={styles.metaItem}>
-                            <FaClock style={{fontSize: '0.7rem', marginRight: '4px'}} />
-                            {new Date(task.dueDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                        </span>
+                        <>
+                            <span style={styles.metaItem}>
+                                <FaCalendarAlt style={{fontSize: '0.7rem', marginRight: '4px', color: '#888'}} />
+                                {new Date(task.dueDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit'})}
+                            </span>
+                            <span style={styles.metaItem}>
+                                <FaClock style={{fontSize: '0.7rem', marginRight: '4px', color: '#888'}} />
+                                {new Date(task.dueDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                            </span>
+                        </>
                     )}
                     {task.location && (
                         <span style={styles.metaItem}>
-                            <FaMapMarkerAlt style={{fontSize: '0.7rem', marginRight: '4px'}} />
+                            <FaMapMarkerAlt style={{fontSize: '0.7rem', marginRight: '4px', color: '#888'}} />
                             {task.location}
-                        </span>
-                    )}
-                    {totalCount > 0 && (
-                        <span style={styles.metaItem}>
-                            📝 {completedCount}/{totalCount}
                         </span>
                     )}
                 </div>
@@ -217,6 +224,11 @@ const TaskItem = ({ task, onDelete, onUpdate }) => {
 
             {/* 3. Actions & Priority */}
             <div style={styles.rightSide}>
+                <div style={styles.hoverActions}>
+                    <button onClick={() => setIsEditing(true)} style={styles.iconActionBtn} title="Edit"><FaEdit /></button>
+                    <button onClick={() => onDelete(task._id)} style={styles.iconActionBtn} title="Delete"><FaTrash /></button>
+                </div>
+
                 <span style={{
                     ...styles.priorityTag,
                     backgroundColor: getPriorityColor(task.priority),
@@ -224,11 +236,6 @@ const TaskItem = ({ task, onDelete, onUpdate }) => {
                 }}>
                     {task.priority}
                 </span>
-                
-                <div style={styles.hoverActions}>
-                    <button onClick={() => setIsEditing(true)} style={styles.iconActionBtn} title="Edit"><FaEdit /></button>
-                    <button onClick={() => onDelete(task._id)} style={styles.iconActionBtn} title="Delete"><FaTrash /></button>
-                </div>
                 
                 <button onClick={() => setIsExpanded(!isExpanded)} style={styles.expandBtn}>
                     {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
@@ -281,18 +288,18 @@ const styles = {
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
-        padding: '12px 10px',
+        padding: '8px 10px', // Reduced padding for compactness
         borderBottom: '1px solid #f5f5f5',
         backgroundColor: 'white',
         transition: 'background-color 0.2s ease',
         position: 'relative'
     },
     checkCircle: {
-        width: '22px',
-        height: '22px',
+        width: '18px', // Smaller check circle
+        height: '18px',
         borderRadius: '50%',
         border: '2px solid #ddd',
-        marginRight: '15px',
+        marginRight: '10px',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
@@ -300,31 +307,31 @@ const styles = {
         transition: 'all 0.2s',
         flexShrink: 0,
     },
-    checkIcon: { fontSize: '10px' },
+    checkIcon: { fontSize: '9px' },
     
-    taskInfo: { flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', cursor: 'pointer', minWidth: '150px' },
-    taskTitle: { fontSize: '0.95rem', fontWeight: '600', color: '#333', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-    taskMeta: { fontSize: '0.75rem', color: '#888', display: 'flex', alignItems: 'center', gap: '10px' },
+    taskInfo: { flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', cursor: 'pointer', minWidth: '120px' }, // Reduced gap
+    taskTitle: { fontSize: '0.9rem', fontWeight: '600', color: '#333', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }, // Slightly smaller font
+    taskMeta: { fontSize: '0.7rem', color: '#888', display: 'flex', alignItems: 'center', gap: '8px' }, // Smaller font and gap
     metaItem: { display: 'flex', alignItems: 'center' },
 
-    rightSide: { display: 'flex', alignItems: 'center', gap: '10px' },
-    priorityTag: { padding: '4px 10px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '700', minWidth: '60px', textAlign: 'center' },
+    rightSide: { display: 'flex', alignItems: 'center', gap: '8px' },
+    priorityTag: { padding: '2px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: '700', minWidth: '50px', textAlign: 'center' }, // Smaller tag
     
-    hoverActions: { display: 'flex', gap: '5px', opacity: 0, transition: 'opacity 0.2s' }, // Hidden by default, shown on hover via CSS
-    iconActionBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#999', fontSize: '0.9rem', padding: '5px' },
-    expandBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontSize: '0.8rem', padding: '5px' },
+    hoverActions: { display: 'flex', gap: '4px', opacity: 0, transition: 'opacity 0.2s' }, 
+    iconActionBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#999', fontSize: '0.8rem', padding: '4px' },
+    expandBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontSize: '0.75rem', padding: '4px' },
 
     // --- Expanded Details ---
-    expandedDetails: { width: '100%', marginTop: '10px', paddingLeft: '37px', paddingRight: '10px', animation: 'fadeIn 0.2s ease' },
-    descText: { fontSize: '0.9rem', color: '#555', marginBottom: '10px', lineHeight: '1.4' },
-    tagsRow: { display: 'flex', gap: '5px', marginBottom: '10px', flexWrap: 'wrap' },
-    tagPill: { backgroundColor: '#f1f3f5', color: '#555', fontSize: '0.75rem', padding: '2px 8px', borderRadius: '10px' },
+    expandedDetails: { width: '100%', marginTop: '8px', paddingLeft: '30px', paddingRight: '10px', animation: 'fadeIn 0.2s ease' },
+    descText: { fontSize: '0.85rem', color: '#555', marginBottom: '8px', lineHeight: '1.4' },
+    tagsRow: { display: 'flex', gap: '4px', marginBottom: '8px', flexWrap: 'wrap' },
+    tagPill: { backgroundColor: '#f1f3f5', color: '#555', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '8px' },
     
-    subtasksList: { backgroundColor: '#f8f9fa', padding: '10px', borderRadius: '8px' },
-    progressBar: { height: '4px', backgroundColor: '#e9ecef', borderRadius: '2px', overflow: 'hidden', marginBottom: '8px' },
+    subtasksList: { backgroundColor: '#f8f9fa', padding: '8px', borderRadius: '6px' },
+    progressBar: { height: '3px', backgroundColor: '#e9ecef', borderRadius: '2px', overflow: 'hidden', marginBottom: '6px' },
     progressFill: { height: '100%', backgroundColor: '#28a745', transition: 'width 0.3s ease' },
-    subtaskRow: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px', cursor: 'pointer' },
-    miniCheck: { width: '16px', height: '16px', borderRadius: '4px', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+    subtaskRow: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', cursor: 'pointer' },
+    miniCheck: { width: '14px', height: '14px', borderRadius: '3px', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' },
 
     // --- Edit Mode Styles ---
     editContainer: { padding: '15px', border: '1px solid #007bff', borderRadius: '8px', backgroundColor: '#fff', marginBottom: '10px' },

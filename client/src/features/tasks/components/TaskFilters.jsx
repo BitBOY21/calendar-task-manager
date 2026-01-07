@@ -110,9 +110,9 @@ const TaskFilters = ({
             {showTitle && (
                 <>
                     <div style={styles.headerRow}>
-                        <h4 style={styles.headerTitle}>FILTER TASKS</h4>
+                        <h4 style={styles.headerTitle}>Filter Tasks</h4>
                         <button onClick={handleResetAll} style={styles.resetBtn}>
-                            RESET ALL
+                            Reset All
                         </button>
                     </div>
                     
@@ -131,7 +131,7 @@ const TaskFilters = ({
 
                     <div style={styles.row}>
                         <div style={styles.group}>
-                            <span style={styles.label}>DAYS:</span>
+                            <span style={styles.label}>Days:</span>
                             <div style={styles.dateBtnGroup}>
                                 {['Today', 'Week', 'Month', 'Custom'].map(d => {
                                     const val = d.toLowerCase();
@@ -185,7 +185,7 @@ const TaskFilters = ({
 
             <div style={styles.row}>
                 <div style={styles.group}>
-                    <span style={styles.label}>STATUS:</span>
+                    <span style={styles.label}>Status:</span>
                     {['All', 'Active', 'Completed'].map(status => {
                         const val = status.toLowerCase();
                         const isActive = currentStatus === val;
@@ -208,7 +208,7 @@ const TaskFilters = ({
             
             <div style={styles.row}>
                  <div style={styles.group}>
-                    <span style={styles.label}>PRIORITY:</span>
+                    <span style={styles.label}>Priority:</span>
                     {['All', 'High', 'Medium', 'Low'].map(p => {
                         const val = p === 'All' ? 'all' : p;
                         const isActive = currentPriority === val;
@@ -232,7 +232,7 @@ const TaskFilters = ({
             {showTitle ? (
                 <div style={styles.row}>
                     <div style={styles.group}>
-                        <span style={styles.label}>TAGS:</span>
+                        <span style={styles.label}>Tags:</span>
                         <div style={{ position: 'relative', width: '100%' }} ref={tagsDropdownRef}>
                             <button 
                                 onClick={() => setIsTagsDropdownOpen(!isTagsDropdownOpen)}
@@ -305,8 +305,18 @@ const TaskFilters = ({
 const styles = {
     container: { display: 'flex', flexDirection: 'column', gap: '15px' },
     headerRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' },
-    headerTitle: { margin: 0, fontSize: '0.9rem', fontWeight: '700', color: '#888', letterSpacing: '0.5px' },
-    resetBtn: { background: 'none', border: 'none', color: '#007bff', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', padding: '0' },
+    headerTitle: { margin: 0, fontSize: '0.9rem', fontWeight: '700', color: 'black', letterSpacing: '0.5px' },
+    resetBtn: { 
+        background: '#f8f9fa', 
+        border: '1px solid #ddd', 
+        color: '#333', 
+        fontSize: '0.75rem', 
+        fontWeight: '600', 
+        cursor: 'pointer', 
+        padding: '4px 10px', 
+        borderRadius: '4px',
+        transition: 'all 0.2s'
+    },
     
     searchRow: { marginBottom: '5px' },
     searchBox: { display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#f8f9fa', padding: '8px 12px', borderRadius: '8px', border: '1px solid #eee', width: '100%' },
@@ -314,7 +324,7 @@ const styles = {
 
     row: { display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' },
     group: { display: 'flex', alignItems: 'center', gap: '10px', width: '100%' },
-    label: { fontWeight: '700', color: '#888', fontSize: '0.75rem', marginRight: '5px', minWidth: '60px', letterSpacing: '0.5px', textTransform: 'uppercase' },
+    label: { fontWeight: '700', color: '#888', fontSize: '0.75rem', marginRight: '5px', minWidth: '60px', letterSpacing: '0.5px' },
     filterBtn: { ...buttonSecondary, padding: '6px 16px', fontWeight: '500', fontSize: '0.85rem' },
     divider: { width: '1px', height: '25px', backgroundColor: '#e0e0e0' },
     
