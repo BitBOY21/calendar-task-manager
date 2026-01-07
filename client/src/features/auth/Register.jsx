@@ -1,24 +1,23 @@
 import React, { useState } from 'react';
 import { authService } from '../../services/authService';
 import logoImg from '../../assets/logo.png'; 
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
-import Register from './Register'; // Import the new Register component
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
-const Login = ({ onLogin }) => {
+const Register = ({ onLogin, onSwitchToLogin }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [isRegistering, setIsRegistering] = useState(false);
+    const [username, setUsername] = useState('');
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleLogin = async (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
-        console.log('🖱️ UI: Login Submit Clicked');
+        console.log('🖱️ UI: Register Submit Clicked');
         setError('');
 
         try {
-            console.log('🔵 UI: Calling Login...');
-            const data = await authService.login(email, password);
+            console.log('🔵 UI: Calling Register...');
+            const data = await authService.register(username, email, password);
             console.log('✅ UI: Auth Success, Data:', data);
             onLogin(data);
         } catch (err) {
@@ -29,24 +28,36 @@ const Login = ({ onLogin }) => {
         }
     };
 
-    // If user wants to register, render the Register component
-    if (isRegistering) {
-        return <Register onLogin={onLogin} onSwitchToLogin={() => setIsRegistering(false)} />;
-    }
-
     return (
         <div style={styles.container}>
             <div style={styles.card}>
                 <div style={styles.header}>
                     <img src={logoImg} alt="MasterTasker" style={styles.logo} />
-                    <h2 style={styles.title}>Welcome Back</h2>
-                    <p style={styles.subtitle}>Please enter your details to sign in.</p>
+                    <h2 style={styles.title}>Create Account</h2>
+                    <p style={styles.subtitle}>Join us and organize your tasks.</p>
                 </div>
 
                 {error && <div style={{color: 'red', marginBottom: '10px', textAlign: 'center'}}>{error}</div>}
 
-                <form onSubmit={handleLogin} style={styles.form}>
+                <form onSubmit={handleRegister} style={styles.form}>
                     
+                    {/* Full Name */}
+                    <div style={styles.inputGroup}>
+                        <label style={styles.label}>Full Name</label>
+                        <div style={styles.inputWrapper}>
+                            <FaUser style={styles.icon} />
+                            <input 
+                                type="text" 
+                                name="name"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                placeholder="John Doe"
+                                style={styles.input}
+                                required 
+                            />
+                        </div>
+                    </div>
+
                     {/* Email */}
                     <div style={styles.inputGroup}>
                         <label style={styles.label}>Email Address</label>
@@ -74,7 +85,7 @@ const Login = ({ onLogin }) => {
                                 name="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                placeholder="••••••••"
+                                placeholder="Create a password"
                                 style={styles.input}
                                 required 
                             />
@@ -85,12 +96,12 @@ const Login = ({ onLogin }) => {
                     </div>
 
                     <button type="submit" style={styles.button}>
-                        Sign In
+                        Sign Up
                     </button>
                 </form>
 
                 <p style={styles.footerText}>
-                    Don't have an account? <span onClick={() => setIsRegistering(true)} style={styles.link}>Create Account</span>
+                    Already have an account? <span onClick={onSwitchToLogin} style={styles.link}>Log In</span>
                 </p>
             </div>
         </div>
@@ -142,4 +153,4 @@ const styles = {
     link: { color: '#007bff', fontWeight: '600', textDecoration: 'none', cursor: 'pointer' }
 };
 
-export default Login;
+export default Register;
