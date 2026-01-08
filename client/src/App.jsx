@@ -1,45 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import { useTaskContext } from './context/TaskContext'; 
+// 1. ייבוא הראוטר
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useTaskContext } from './context/TaskContext';
 import Sidebar from './components/layout/Sidebar';
 import TaskDrawer from './components/layout/TaskDrawer';
-import DashboardPage from './pages/DashboardPage'; 
-import WorkPage from './pages/WorkPage'; 
-import AnalyticsPage from './pages/AnalyticsPage'; 
-import HistoryPage from './pages/HistoryPage'; 
-import SettingsPage from './pages/SettingsPage'; 
-import TaskForm from './features/tasks/components/TaskForm'; 
+import DashboardPage from './pages/DashboardPage';
+import WorkPage from './pages/WorkPage';
+import AnalyticsPage from './pages/AnalyticsPage';
+import HistoryPage from './pages/HistoryPage';
+import SettingsPage from './pages/SettingsPage';
+import TaskForm from './features/tasks/components/TaskForm';
 import Login from './features/auth/Login';
 import { authService } from './services/authService';
 import { FaPlus } from 'react-icons/fa';
 import './index.css';
 
-function App() {
-    const [token, setToken] = useState(null);
-    const [user, setUser] = useState({ name: 'User' });
-    const [currentView, setCurrentView] = useState('dashboard'); 
-    
-    const { addTask, updateTask, deleteTask, fetchTasks } = useTaskContext();
+// --- רכיב פנימי שמנהל את הניווט אחרי התחברות ---
+const AppLayout = ({ user, onLogout }) => {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // חישוב המסך הנוכחי מתוך ה-URL עבור ה-Sidebar
+    // לדוגמה: אם הכתובת היא /calendar, המשתנה יהיה 'calendar'
+    const currentPath = location.pathname.replace('/', '');
+    const currentView = currentPath === '' || currentPath === 'dashboard' ? 'dashboard' : currentPath;
+
+    const { addTask, updateTask, deleteTask } = useTaskContext();
 
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false); 
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
-    const [selectedDate, setSelectedDate] = useState(null); 
+    const [selectedDate, setSelectedDate] = useState(null);
 
-    useEffect(() => {
-        const savedToken = authService.getToken();
-        if (savedToken) {
-            console.log('🔄 App: Found saved token, restoring session...');
-            setToken(savedToken);
-            setUser({ name: authService.getUserName() });
-        }
-    }, []);
-
-    useEffect(() => {
-        if (token) {
-            console.log('🔄 App: Token changed, fetching tasks...');
-            fetchTasks();
-        }
-    }, [token, fetchTasks]);
+    // פונקציית גישור: כשהסרגל הצדדי מבקש לשנות מסך, אנחנו משנים את ה-URL
+    const handleViewChange = (view) => {
+        navigate(`/${view}`);
+    };
 
     const handleTaskClick = (task) => {
         setSelectedTask(task);
@@ -48,94 +44,67 @@ function App() {
 
     const handleAddTask = async (newTask) => {
         await addTask(newTask);
-        setIsAddModalOpen(false); 
-        setSelectedDate(null); 
+        setIsAddModalOpen(false);
+        setSelectedDate(null);
     };
 
-    const handleUpdateTask = async (taskId, updatedData) => { 
+    const handleUpdateTask = async (taskId, updatedData) => {
         await updateTask(taskId, updatedData);
         if (selectedTask && selectedTask._id === taskId) {
             setSelectedTask(prev => ({ ...prev, ...updatedData }));
         }
     };
 
-    const handleDeleteTask = async (id) => { 
+    const handleDeleteTask = async (id) => {
         await deleteTask(id);
         setIsDrawerOpen(false);
     };
 
-    const handleEventDrop = async ({ event, start, end }) => { 
+    const handleEventDrop = async ({ event, start, end }) => {
         await updateTask(event.id, { dueDate: start, endDate: end });
     };
 
-    const handleLogout = () => {
-        console.log('👋 App: Logging out...');
-        authService.logout();
-        setToken(null);
-        setUser({ name: 'User' });
-    };
+    return (
+        <div className="app-layout" style={styles.appContainer}>
 
-    const renderContent = () => {
-        switch (currentView) {
-            case 'dashboard':
-                return <DashboardPage onChangeView={setCurrentView} user={user} />;
-            
-            case 'calendar': 
-                return <WorkPage 
+            {/* ה-Sidebar מקבל את המיקום מה-URL ומשתמש ב-navigate לשינוי */}
+            <Sidebar
+                currentView={currentView}
+                onChangeView={handleViewChange}
+                onLogout={onLogout}
+            />
+
+            <div style={styles.mainContent}>
+                {/* הגדרת הנתיבים (Routes) במקום Switch Case */}
+                <Routes>
+                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                    <Route path="/dashboard" element={<DashboardPage onChangeView={handleViewChange} user={user} />} />
+
+                    <Route path="/calendar" element={
+                        <WorkPage
                             onDateSelect={(date) => {
                                 setSelectedDate(date);
                                 setIsAddModalOpen(true);
                             }}
                             onEventDrop={handleEventDrop}
                             onEventClick={handleTaskClick}
-                       />;
-            
-            case 'list': 
-                return <AnalyticsPage user={user} />;
+                        />
+                    } />
 
-            case 'history':
-                return <HistoryPage />;
+                    <Route path="/list" element={<AnalyticsPage user={user} />} />
+                    <Route path="/stats" element={<AnalyticsPage user={user} />} />
+                    <Route path="/history" element={<HistoryPage />} />
+                    <Route path="/settings" element={<SettingsPage user={user} />} />
 
-            case 'settings':
-                return <SettingsPage user={user} />;
-            
-            case 'stats':
-                return <AnalyticsPage user={user} />;
+                    {/* נתיב ברירת מחדל לכל כתובת לא מוכרת */}
+                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </Routes>
 
-            default:
-                return <DashboardPage onChangeView={setCurrentView} user={user} />;
-        }
-    };
-
-    if (!token) return <Login onLogin={(authData) => {
-        console.log('🔑 App: onLogin called with:', authData);
-        if (typeof authData === 'string') {
-            setToken(authData);
-            setUser({ name: authService.getUserName() });
-        } else {
-            setToken(authData.token);
-            setUser({ name: authData.name, email: authData.email });
-            localStorage.setItem('token', authData.token);
-            localStorage.setItem('userName', authData.name);
-        }
-    }} />;
-
-    return (
-        <div className="app-layout" style={styles.appContainer}>
-            
-            <Sidebar 
-                currentView={currentView} 
-                onChangeView={setCurrentView} 
-                onLogout={handleLogout} 
-            />
-
-            <div style={styles.mainContent}>
-                {renderContent()}
-
+                {/* כפתור הפלוס מופיע רק אם אנחנו לא ב-dashboard */}
                 {currentView !== 'dashboard' && (
-                    <button 
+                    <button
                         onClick={() => {
-                            setSelectedDate(new Date()); 
+                            setSelectedDate(new Date());
                             setIsAddModalOpen(true);
                         }}
                         style={fabStyle}
@@ -146,8 +115,8 @@ function App() {
                 )}
             </div>
 
-            <TaskDrawer 
-                isOpen={isDrawerOpen} 
+            <TaskDrawer
+                isOpen={isDrawerOpen}
                 onClose={() => setIsDrawerOpen(false)}
                 task={selectedTask}
                 onUpdate={handleUpdateTask}
@@ -165,6 +134,54 @@ function App() {
             />
         </div>
     );
+};
+
+// --- הרכיב הראשי ---
+function App() {
+    const [token, setToken] = useState(null);
+    const [user, setUser] = useState({ name: 'User' });
+
+    const { fetchTasks } = useTaskContext();
+
+    useEffect(() => {
+        const savedToken = authService.getToken();
+        if (savedToken) {
+            setToken(savedToken);
+            setUser({ name: authService.getUserName() });
+        }
+    }, []);
+
+    useEffect(() => {
+        if (token) {
+            fetchTasks();
+        }
+    }, [token, fetchTasks]);
+
+    const handleLogout = () => {
+        authService.logout();
+        setToken(null);
+        setUser({ name: 'User' });
+    };
+
+    // אם אין טוקן, מציגים את הלוגין (מחוץ לראוטר, או בתוכו - לבחירתך. כאן השארתי כמו שהיה)
+    if (!token) return <Login onLogin={(authData) => {
+        if (typeof authData === 'string') {
+            setToken(authData);
+            setUser({ name: authService.getUserName() });
+        } else {
+            setToken(authData.token);
+            setUser({ name: authData.name, email: authData.email });
+            localStorage.setItem('token', authData.token);
+            localStorage.setItem('userName', authData.name);
+        }
+    }} />;
+
+    // ברגע שמחוברים, עוטפים ב-BrowserRouter כדי לאפשר ניווט מבוסס URL
+    return (
+        <BrowserRouter>
+            <AppLayout user={user} onLogout={handleLogout} />
+        </BrowserRouter>
+    );
 }
 
 const styles = {
@@ -172,14 +189,13 @@ const styles = {
         display: 'flex',
         height: '100vh',
         overflow: 'hidden',
-        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)', // Global Gradient
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
     },
     mainContent: {
         flex: 1,
         position: 'relative',
-        backgroundColor: 'transparent', // Transparent to show gradient
+        backgroundColor: 'transparent',
         overflow: 'hidden',
-        // No padding here, individual pages handle their own padding/layout
     }
 };
 

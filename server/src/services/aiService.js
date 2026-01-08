@@ -69,11 +69,13 @@ const generateBreakdown = async (taskInput) => {
     };
 
     if (!genAI) {
-        console.warn("⚠️ No Gemini API Key found. Returning Mock Data.");
+        console.warn("⚠️ AI SERVICE: No Gemini API Key found in .env file.");
+        console.log("👉 Returning Mock Data (Generic responses)");
         return getMockSteps(title);
     }
 
     try {
+        console.log(`🤖 AI SERVICE: Generating breakdown for "${title}"...`);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         // --- 3. Updated Prompt with Context ---
@@ -83,13 +85,15 @@ const generateBreakdown = async (taskInput) => {
         ${priority ? `Priority: ${priority}` : ''}
         ${tags ? `Tags: ${tags}` : ''}
 
-        Into 3 to 5 short, actionable subtasks.
+        Create exactly 3 to 5 short, actionable subtasks.
         Return ONLY the subtasks as a plain list separated by newlines. 
         Do not use numbers, bullet points, or bold text.`;
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
+        
+        console.log("✅ AI SERVICE: Success! Response received.");
 
         // Clean and process the response into an array
         const steps = text.split('\n')
@@ -101,7 +105,8 @@ const generateBreakdown = async (taskInput) => {
         return steps;
 
     } catch (error) {
-        console.error("Gemini AI Error (Falling back to Mock Data):", error.message);
+        console.error("🔥 AI SERVICE ERROR:", error.message);
+        console.log("👉 Falling back to Mock Data due to error.");
         // Return enhanced mock data so the user gets a good experience even without AI
         return getMockSteps(title);
     }

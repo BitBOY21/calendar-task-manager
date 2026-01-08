@@ -2,7 +2,9 @@ import React from 'react';
 import { FaHome, FaCalendarAlt, FaChartPie, FaHistory, FaCog, FaSignOutAlt } from 'react-icons/fa';
 import logo from '../../assets/logo.png';
 
+// קומפוננטת התפריט הצדדי - מקבלת את המסך הנוכחי (כדי לסמן אותו) ופונקציות לניווט והתנתקות
 const Sidebar = ({ currentView, onChangeView, onLogout }) => {
+    // הגדרת פריטי התפריט במערך - מקל על הוספה או הסרה של דפים בעתיד
     const menuItems = [
         { id: 'dashboard', label: 'Home', icon: <FaHome /> },
         { id: 'calendar', label: 'Calendar', icon: <FaCalendarAlt /> },
@@ -11,19 +13,24 @@ const Sidebar = ({ currentView, onChangeView, onLogout }) => {
     ];
 
     return (
+        // המעטפת החיצונית שממקמת את הסרגל בצד שמאל
         <div style={styles.sidebarContainer}>
             <div style={styles.sidebar}>
+                {/* אזור הלוגו */}
                 <div style={styles.logoContainer}>
                     <img src={logo} alt="MasterTasker" style={styles.logoImage} />
                 </div>
 
+                {/* אזור הניווט הראשי - רץ בלולאה על המערך שיצרנו למעלה */}
                 <nav style={styles.nav}>
                     {menuItems.map(item => (
                         <button
                             key={item.id}
+                            // בעת לחיצה, אנחנו מודיעים לאבא (App) לשנות את המסך
                             onClick={() => onChangeView(item.id)}
                             style={{
                                 ...styles.navItem,
+                                // עיצוב מותנה: אם הכפתור הזה הוא המסך הנוכחי, תן לו רקע כחול וסגנון מודגש
                                 background: currentView === item.id 
                                     ? 'linear-gradient(135deg, rgba(0,123,255,0.1), rgba(111,66,193,0.1))' 
                                     : 'transparent',
@@ -39,6 +46,7 @@ const Sidebar = ({ currentView, onChangeView, onLogout }) => {
                     ))}
                 </nav>
 
+                {/* החלק התחתון - הגדרות והתנתקות */}
                 <div style={styles.footer}>
                     <button
                         onClick={() => onChangeView('settings')}
@@ -47,6 +55,7 @@ const Sidebar = ({ currentView, onChangeView, onLogout }) => {
                         <span style={styles.icon}><FaCog /></span> Settings
                     </button>
 
+                    {/* כפתור התנתקות עם אפקט Hover מיוחד באדום */}
                     <button
                         onClick={onLogout}
                         style={{
@@ -71,6 +80,7 @@ const Sidebar = ({ currentView, onChangeView, onLogout }) => {
     );
 };
 
+// אובייקט העיצוב
 const styles = {
     sidebarContainer: {
         height: '100vh',
@@ -80,7 +90,7 @@ const styles = {
         zIndex: 100
     },
     sidebar: {
-        width: '260px',
+        width: '240px',
         backgroundColor: '#ffffff', // Pure white as requested
         borderRadius: '20px', // Rounded corners
         display: 'flex',
@@ -91,18 +101,18 @@ const styles = {
         border: 'none' // Removed border for cleaner floating look
     },
     logoContainer: {
-        textAlign: 'center',
-        marginBottom: '32px',
-        padding: '0 24px',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '80px'
+        textAlign: 'center',       // text-align: center
+        marginBottom: '20px',      // margin-bottom: 32px
+        padding: '0 20px',         // padding: 0px 24px
+        display: 'flex',           // display: flex
+        justifyContent: 'center',  // justify-content: center
+        alignItems: 'center',      // align-items: center
+        height: '100px'             // height: 80px
     },
     logoImage: {
-        maxWidth: '100%',
-        maxHeight: '100%',
-        objectFit: 'contain'
+        maxWidth: '100%',          // max-width: 100%
+        maxHeight: '100%',         // max-height: 100%
+        objectFit: 'contain'       // object-fit: contain
     },
     nav: { 
         display: 'flex', 

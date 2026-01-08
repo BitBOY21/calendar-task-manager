@@ -8,6 +8,9 @@ const getTaskBreakdown = async (req, res) => {
     try {
         // שלוף את כל הפרטים הרלוונטיים, לא רק כותרת
         const { title, description, priority, tags } = req.body;
+        
+        // לוג לבדיקה שהבקשה מגיעה עם המידע הנכון
+        console.log("📩 AI CONTROLLER: Received request:", { title, priority });
 
         if (!title) {
             return res.status(400).json({ message: 'Please provide a task title' });

@@ -1,22 +1,25 @@
 import React from 'react';
 import TaskItem from '../../features/tasks/components/TaskItem'; // Updated path
 
+// קומפוננטת "מגירה" שנפתחת מצד ימין להצגת פרטי משימה
 const TaskDrawer = ({ isOpen, onClose, task, onUpdate, onDelete }) => {
     return (
         <>
-            {/* Dark background (Overlay) */}
+            {/* שכבת הרקע הכהה (Overlay) - מכסה את שאר המסך */}
             <div 
                 style={{
                     ...styles.overlay,
+                    // אם המגירה פתוחה - הרקע נראה ולחיץ. אם סגורה - הוא שקוף ולא מפריע
                     opacity: isOpen ? 1 : 0,
                     pointerEvents: isOpen ? 'auto' : 'none'
                 }} 
                 onClick={onClose}
             />
 
-            {/* The drawer itself */}
+            {/* המגירה עצמה - החלון הלבן שנכנס מצד ימין */}
             <div style={{
                 ...styles.drawer,
+                // אנימציית הכניסה: אם פתוח - במיקום 0. אם סגור - זז 100% ימינה (מחוץ למסך)
                 transform: isOpen ? 'translateX(0)' : 'translateX(100%)'
             }}>
                 <div style={styles.header}>
@@ -24,6 +27,7 @@ const TaskDrawer = ({ isOpen, onClose, task, onUpdate, onDelete }) => {
                     <button onClick={onClose} style={styles.closeBtn}>✕</button>
                 </div>
 
+                {/* תוכן המגירה - מציג את המשימה או הודעה ריקה */}
                 <div style={styles.content}>
                     {task ? (
                         <TaskItem 
