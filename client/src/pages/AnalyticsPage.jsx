@@ -129,6 +129,9 @@ const AnalyticsPage = ({ user, onRequestDelete, onEditTask }) => {
 
             <SummaryStats tasks={tasks} />
 
+            {/* Swapped SummaryCharts and All Tasks Card */}
+            <SummaryCharts tasks={tasks} />
+
             <Card style={{ padding: '25px', marginBottom: '20px' }}>
                 <div style={styles.sectionHeader}>
                     <h3 style={styles.sectionTitle}>📋 All Tasks ({filteredTasks.length})</h3>
@@ -167,8 +170,6 @@ const AnalyticsPage = ({ user, onRequestDelete, onEditTask }) => {
                 </div>
             </Card>
 
-            <SummaryCharts tasks={tasks} />
-
             <ActivityLog tasks={tasks} />
 
             {/* Only render local TaskForm if we are managing editing locally (fallback) */}
@@ -191,8 +192,8 @@ const styles = {
     header: { marginBottom: '25px', textAlign: 'center' },
     subtitle: { color: '#666', fontSize: '1.1rem', fontWeight: '400' },
     
-    sectionHeader: { marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' },
-    sectionTitle: { fontSize: '1.3rem', color: '#333', fontWeight: '700', margin: 0 },
+    sectionHeader: { marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }, // Reverted to left-aligned
+    sectionTitle: { fontSize: '1.3rem', color: '#333', fontWeight: '700', margin: 0 }, // Reverted to left-aligned
     
     filtersWrapper: { marginBottom: '20px', paddingBottom: '15px', borderBottom: '1px solid #f0f0f0' },
 

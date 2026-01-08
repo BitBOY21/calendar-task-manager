@@ -304,8 +304,8 @@ const TaskFilters = ({
 
 const styles = {
     container: { display: 'flex', flexDirection: 'column', gap: '15px' },
-    headerRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' },
-    headerTitle: { margin: 0, fontSize: '0.9rem', fontWeight: '700', color: 'black', letterSpacing: '0.5px' },
+    headerRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', borderBottom: '2px solid #f0f0f0', paddingBottom: '15px' },
+    headerTitle: { margin: 0, fontSize: '1.1rem', fontWeight: '700', color: '#333', letterSpacing: '0.5px' },
     resetBtn: { 
         background: '#f8f9fa', 
         border: '1px solid #ddd', 

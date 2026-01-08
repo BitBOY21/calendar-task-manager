@@ -55,7 +55,7 @@ const DashboardPage = ({ user, onChangeView, onRequestDelete }) => {
             
             <div style={styles.headerContainer}>
                 <h1 style={styles.greeting}>
-                    {greeting}, <span className="text-gradient">{userName}</span> 👋
+                    <span className="text-gradient">{greeting}</span> <span className="text-gradient">{userName}</span> 👋
                 </h1>
                 <p style={styles.subGreeting}>Here's your daily overview</p>
             </div>
