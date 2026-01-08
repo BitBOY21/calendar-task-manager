@@ -13,7 +13,7 @@ const DeleteRecurringModal = ({ isOpen, onClose, onConfirm }) => {
     return (
         <div style={styles.overlay}>
             <div style={styles.modal}>
-                <h3 style={styles.title}>Delete recurring event</h3>
+                <h3 style={styles.title}>Delete recurring task</h3>
                 
                 <div style={styles.content}>
                     <label style={styles.option}>
@@ -64,22 +64,25 @@ const styles = {
     modal: {
         backgroundColor: 'white',
         padding: '24px',
-        borderRadius: '8px',
-        width: '300px',
-        boxShadow: '0 4px 25px rgba(0,0,0,0.15)',
-        fontFamily: 'inherit'
+        borderRadius: '12px',
+        width: '320px',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+        fontFamily: 'inherit',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px'
     },
     title: {
-        margin: '0 0 20px 0',
-        fontSize: '1.1rem',
+        margin: 0,
+        fontSize: '1.2rem',
         fontWeight: '600',
-        color: '#333'
+        color: '#333',
+        textAlign: 'center'
     },
     content: {
         display: 'flex',
         flexDirection: 'column',
-        gap: '15px',
-        marginBottom: '25px'
+        gap: '12px'
     },
     option: {
         display: 'flex',
@@ -87,7 +90,11 @@ const styles = {
         gap: '10px',
         cursor: 'pointer',
         fontSize: '0.95rem',
-        color: '#3c4043'
+        color: '#3c4043',
+        padding: '8px',
+        borderRadius: '6px',
+        transition: 'background 0.1s',
+        ':hover': { backgroundColor: '#f5f5f5' }
     },
     radio: {
         accentColor: '#1a73e8',
@@ -97,28 +104,34 @@ const styles = {
     },
     actions: {
         display: 'flex',
-        justifyContent: 'flex-end',
-        gap: '10px'
+        justifyContent: 'center', // Center buttons
+        gap: '12px',
+        marginTop: '10px'
     },
     cancelBtn: {
-        background: 'none',
-        border: 'none',
-        color: '#5f6368',
-        padding: '8px 16px',
-        borderRadius: '4px',
+        padding: '10px 24px',
+        borderRadius: '8px',
+        border: '1px solid #ddd',
+        backgroundColor: 'white',
         cursor: 'pointer',
         fontWeight: '500',
-        fontSize: '0.9rem'
+        color: '#555',
+        fontSize: '0.95rem',
+        flex: 1, // Equal width
+        transition: 'background 0.2s'
     },
     okBtn: {
-        background: 'none',
+        padding: '10px 24px',
+        borderRadius: '8px',
         border: 'none',
-        color: '#1a73e8',
-        padding: '8px 16px',
-        borderRadius: '4px',
+        backgroundColor: '#1a73e8', // Blue primary color
+        color: 'white',
         cursor: 'pointer',
         fontWeight: '600',
-        fontSize: '0.9rem'
+        fontSize: '0.95rem',
+        flex: 1, // Equal width
+        boxShadow: '0 2px 5px rgba(26, 115, 232, 0.3)',
+        transition: 'background 0.2s'
     }
 };
 
