@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { taskService } from '../../../services/taskService';
 import { FaTimes, FaMagic, FaTrash, FaMapMarkerAlt, FaClock, FaCalendarAlt, FaTag, FaChevronDown, FaFlag, FaListUl, FaAlignLeft, FaPen, FaPlus, FaRedo } from 'react-icons/fa';
+import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 
 const TAG_OPTIONS = [
     "Work 💼", "Personal 🏠", "Shopping 🛒", "Health 💪", "Finance 💰",
@@ -27,6 +28,9 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
     
     const [isTagsDropdownOpen, setIsTagsDropdownOpen] = useState(false);
     const tagsDropdownRef = useRef(null);
+
+    // Confirmation Modal State
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     // Helper to format date as YYYY-MM-DD using local time
     const toLocalDateString = (date) => {
@@ -177,6 +181,20 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
         return new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long' });
     };
 
+    // Handle delete button click
+    const handleDeleteClick = () => {
+        setIsDeleteModalOpen(true);
+    };
+
+    // Handle confirm delete
+    const handleConfirmDelete = () => {
+        if (taskToEdit) {
+            onDelete(taskToEdit._id);
+            onClose();
+        }
+        setIsDeleteModalOpen(false);
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -198,7 +216,7 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
                             
                             <div style={styles.actions}>
                                 {taskToEdit && (
-                                    <button type="button" onClick={() => { if(window.confirm('Delete?')) { onDelete(taskToEdit._id); onClose(); }}} style={styles.iconBtn} title="Delete">
+                                    <button type="button" onClick={handleDeleteClick} style={styles.iconBtn} title="Delete">
                                         <FaTrash color="#dc3545" />
                                     </button>
                                 )}
@@ -397,6 +415,15 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
                     </button>
                 </form>
             </div>
+
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                title="Delete Task?"
+                message="Are you sure you want to delete this task? This action cannot be undone."
+            />
         </div>
     );
 };

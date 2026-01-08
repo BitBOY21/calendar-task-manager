@@ -13,6 +13,7 @@ import TaskForm from './features/tasks/components/TaskForm';
 import Login from './features/auth/Login';
 import { authService } from './services/authService';
 import { FaPlus } from 'react-icons/fa';
+import ConfirmationModal from './components/ui/ConfirmationModal'; // Import the new modal
 import './index.css';
 
 // --- רכיב פנימי שמנהל את הניווט אחרי התחברות ---
@@ -31,6 +32,10 @@ const AppLayout = ({ user, onLogout }) => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
+
+    // State for delete confirmation modal
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [taskToDeleteId, setTaskToDeleteId] = useState(null);
 
     // פונקציית גישור: כשהסרגל הצדדי מבקש לשנות מסך, אנחנו משנים את ה-URL
     const handleViewChange = (view) => {
@@ -55,9 +60,20 @@ const AppLayout = ({ user, onLogout }) => {
         }
     };
 
-    const handleDeleteTask = async (id) => {
-        await deleteTask(id);
-        setIsDrawerOpen(false);
+    // Modified delete handler to open modal instead of deleting immediately
+    const handleRequestDelete = (taskId) => {
+        setTaskToDeleteId(taskId);
+        setIsDeleteModalOpen(true);
+    };
+
+    // Actual delete function called by modal
+    const handleConfirmDelete = async () => {
+        if (taskToDeleteId) {
+            await deleteTask(taskToDeleteId);
+            setIsDrawerOpen(false); // Close drawer if open
+        }
+        setIsDeleteModalOpen(false);
+        setTaskToDeleteId(null);
     };
 
     const handleEventDrop = async ({ event, start, end }) => {
@@ -120,7 +136,7 @@ const AppLayout = ({ user, onLogout }) => {
                 onClose={() => setIsDrawerOpen(false)}
                 task={selectedTask}
                 onUpdate={handleUpdateTask}
-                onDelete={handleDeleteTask}
+                onDelete={handleRequestDelete} // Pass the new handler
             />
 
             <TaskForm
@@ -131,6 +147,15 @@ const AppLayout = ({ user, onLogout }) => {
                 }}
                 onAdd={handleAddTask}
                 initialDate={selectedDate}
+            />
+
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                title="Delete Task?"
+                message="Are you sure you want to delete this task? This action cannot be undone."
             />
         </div>
     );
