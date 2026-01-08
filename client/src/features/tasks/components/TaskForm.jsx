@@ -267,13 +267,10 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
                         </div>
                     </div>
 
-                    {/* AI Subtasks */}
+                    {/* Subtasks - AI Removed */}
                     <div style={styles.aiBox}>
                         <div style={styles.aiHeader}>
-                            <span style={styles.label}>⚡ AI Breakdown</span>
-                            <button type="button" onClick={handleAiBreakdown} disabled={!title || loadingAI} style={styles.aiBtn}>
-                                <FaMagic /> {loadingAI ? 'Generating...' : 'Auto-Generate'}
-                            </button>
+                            <span style={styles.label}>Subtasks</span>
                         </div>
                         <div style={styles.subtaskList}>
                             {subtasks.map((step, i) => (

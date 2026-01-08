@@ -76,7 +76,8 @@ const generateBreakdown = async (taskInput) => {
 
     try {
         console.log(`🤖 AI SERVICE: Generating breakdown for "${title}"...`);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // שינוי המודל ל-gemini-1.5-flash (המודל המהיר והחסכוני)
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         // --- 3. Updated Prompt with Context ---
         const prompt = `You are an expert productivity assistant. 
