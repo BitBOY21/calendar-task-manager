@@ -118,9 +118,18 @@ const DashboardPage = ({ user, onChangeView, onRequestDelete }) => {
 };
 
 const styles = {
-    container: { maxWidth: '1000px', margin: '0 auto', padding: '20px', position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column' }, // Removed backgroundColor
+    container: { 
+        maxWidth: '1000px', 
+        margin: '0 auto', 
+        padding: '20px', 
+        position: 'relative', 
+        height: '100%', // Changed from minHeight to height
+        overflowY: 'auto', // Added scrolling
+        display: 'flex', 
+        flexDirection: 'column' 
+    },
     
-    headerContainer: { textAlign: 'center', marginBottom: '25px' },
+    headerContainer: { textAlign: 'center', marginBottom: '25px', flexShrink: 0 },
     greeting: { margin: 0, fontSize: '2.2rem', fontWeight: '800', color: '#333' },
     subGreeting: { margin: '5px 0 0 0', fontSize: '1.1rem', color: '#666' },
 

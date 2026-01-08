@@ -419,7 +419,7 @@ const styles = {
     
     expandedDetails: {
         width: '100%',
-        marginTop: '-15px',
+        marginTop: '0px',
         paddingLeft: '32px', // הזחה שמאלה כדי להתיישר עם הטקסט (מתחת לצ'קבוקס)
         animation: 'fadeIn 0.2s ease', // אנימציית כניסה
         cursor: 'default' // סמן רגיל (לא יד)
