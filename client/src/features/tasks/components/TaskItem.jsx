@@ -267,17 +267,25 @@ const TaskItem = ({ task, onDelete, onUpdate, onEdit }) => {
             {/* 4. Expanded Details (Conditional) */}
             {isExpanded && (
                 <div style={styles.expandedDetails} onClick={(e) => e.stopPropagation()}>
-                    {task.description && <div style={styles.descText}>{task.description}</div>}
+                    {/* Details Section */}
+                    {task.description && (
+                        <div style={{ marginBottom: '12px' }}>
+                            <div style={styles.sectionHeader}>Details:</div>
+                            <div style={{...styles.descText, whiteSpace: 'pre-wrap'}}>{task.description}</div>
+                        </div>
+                    )}
                     
+                    {/* Tags */}
                     {task.tags && task.tags.length > 0 && (
                         <div style={styles.tagsRow}>
                             {task.tags.map(tag => <span key={tag} style={styles.tagPill}>{tag}</span>)}
                         </div>
                     )}
 
+                    {/* Subtasks Section */}
                     {totalCount > 0 && (
                         <div style={styles.subtasksList}>
-                            <div style={styles.progressBar}><div style={{...styles.progressFill, width: `${progress}%`}} /></div>
+                            <div style={styles.sectionHeader}>Subtasks:</div>
                             {localSubtasks.map((subtask, i) => (
                                 <div key={i} style={styles.subtaskRow} onClick={() => toggleSubtask(i)}>
                                     <div style={{
@@ -305,74 +313,88 @@ const TaskItem = ({ task, onDelete, onUpdate, onEdit }) => {
 };
 
 const styles = {
-    // --- View Mode Styles ---
+    // --- View Mode Styles (תצוגה רגילה) ---
+    
+    // השורה הראשית של המשימה
     taskRow: {
         display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'flex-start', // Align to top for multi-line content
-        padding: '12px 16px',
-        borderBottom: '1px solid #f0f0f0',
+        flexWrap: 'wrap', // מאפשר שבירת שורות אם התוכן ארוך
+        alignItems: 'flex-start', // יישור למעלה (חשוב כשיש תיאור ארוך)
+        padding: '12px 16px', // ריווח פנימי נוח
+        borderBottom: '1px solid #f0f0f0', // קו מפריד עדין בין משימות
         backgroundColor: 'white',
-        transition: 'background-color 0.2s ease',
+        transition: 'background-color 0.2s ease', // אנימציה חלקה ב-Hover
         position: 'relative',
-        cursor: 'pointer',
-        gap: '12px'
+        cursor: 'pointer', // מראה שזה לחיץ
+        gap: '12px' // מרווח בין האלמנטים (צ'קבוקס, תוכן, כפתורים)
     },
+    
+    // עיגול הצ'קבוקס (לסימון בוצע/לא בוצע)
     checkCircle: {
         width: '20px',
         height: '20px',
-        borderRadius: '50%',
+        borderRadius: '50%', // הופך את הריבוע לעיגול מושלם
         border: '2px solid #ddd',
-        marginTop: '2px', // Align with first line of text
+        marginTop: '2px', // יישור אופטי מול השורה הראשונה של הטקסט
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         transition: 'all 0.2s',
-        flexShrink: 0,
+        flexShrink: 0, // מונע מהעיגול להתכווץ אם אין מקום
     },
     checkIcon: { fontSize: '10px' },
     
+    // האזור המרכזי (כותרת + מידע נוסף)
     centerContent: {
-        flex: 1,
+        flex: 1, // תופס את כל המקום הפנוי
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column', // מסדר את הכותרת מעל המידע הנוסף
         gap: '4px',
-        minWidth: 0 // Allow text truncation
+        minWidth: 0 // טריק ב-Flexbox שמאפשר לטקסט להתקצר עם ...
     },
+    
+    // כותרת המשימה
     taskTitle: {
         fontSize: '1rem',
         fontWeight: '500',
         color: '#333',
-        lineHeight: '1.4'
+        lineHeight: '1.4' // גובה שורה לקריאות טובה
     },
+    
+    // שורת המידע (תאריך, שעה, מיקום, עדיפות)
     metaRow: {
         display: 'flex',
         alignItems: 'center',
-        gap: '12px', // Increased gap for better separation
-        fontSize: '0.75rem',
+        gap: '12px', // מרווח בין הפריטים השונים
+        fontSize: '0.75rem', // טקסט קטן יותר למידע משני
         color: '#666',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap' // יורד שורה אם אין מקום
     },
+    
+    // תווית העדיפות (High/Medium/Low)
     priorityPill: {
         padding: '1px 6px',
         borderRadius: '4px',
         fontSize: '0.65rem',
         fontWeight: '600',
-        textTransform: 'uppercase',
+        textTransform: 'uppercase', // אותיות גדולות
         letterSpacing: '0.5px'
     },
+    
+    // פריט מידע בודד (אייקון + טקסט)
     metaItem: {
         display: 'flex',
         alignItems: 'center',
         gap: '4px'
     },
 
+    // כפתורי הפעולה בצד ימין (עריכה, מחיקה)
     rightActions: {
         display: 'flex',
         alignItems: 'center',
         gap: '8px',
-        opacity: 0.6, // Subtle by default
+        opacity: 0.6, // שקוף חלקית כברירת מחדל (פחות בולט)
         transition: 'opacity 0.2s'
     },
     actionIconBtn: {
@@ -393,38 +415,159 @@ const styles = {
         }
     },
 
-    // --- Expanded Details ---
+    // --- Expanded Details (פירוט מורחב שנפתח בלחיצה) ---
+    
     expandedDetails: {
         width: '100%',
-        marginTop: '12px',
-        paddingLeft: '32px', // Indent to align with text
-        animation: 'fadeIn 0.2s ease',
-        cursor: 'default'
+        marginTop: '-15px',
+        paddingLeft: '32px', // הזחה שמאלה כדי להתיישר עם הטקסט (מתחת לצ'קבוקס)
+        animation: 'fadeIn 0.2s ease', // אנימציית כניסה
+        cursor: 'default' // סמן רגיל (לא יד)
     },
-    descText: { fontSize: '0.9rem', color: '#555', marginBottom: '10px', lineHeight: '1.5' },
-    tagsRow: { display: 'flex', gap: '6px', marginBottom: '10px', flexWrap: 'wrap' },
-    tagPill: { backgroundColor: '#e9ecef', color: '#495057', fontSize: '0.75rem', padding: '2px 8px', borderRadius: '12px' },
+    sectionHeader: {
+        fontSize: '0.85rem',
+        fontWeight: 'bold',
+        color: '#555',
+        marginBottom: '4px',
+        marginTop: '10px'
+    },
+    descText: { 
+        fontSize: '0.9rem', 
+        color: '#555', 
+        marginBottom: '10px', 
+        lineHeight: '1.5' 
+    },
+    tagsRow: { 
+        display: 'flex', 
+        gap: '6px', 
+        marginBottom: '10px', 
+        flexWrap: 'wrap' 
+    },
+    tagPill: { 
+        backgroundColor: '#e9ecef', 
+        color: '#495057', 
+        fontSize: '0.75rem', 
+        padding: '2px 8px', 
+        borderRadius: '12px' 
+    },
     
-    subtasksList: { backgroundColor: '#f8f9fa', padding: '10px', borderRadius: '8px', marginTop: '10px' },
-    progressBar: { height: '4px', backgroundColor: '#e9ecef', borderRadius: '2px', overflow: 'hidden', marginBottom: '8px' },
-    progressFill: { height: '100%', backgroundColor: '#28a745', transition: 'width 0.3s ease' },
-    subtaskRow: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px', cursor: 'pointer', padding: '4px 0' },
-    miniCheck: { width: '16px', height: '16px', borderRadius: '4px', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+    // רשימת תתי-המשימות
+    subtasksList: { 
+        backgroundColor: '#f8f9fa', // רקע אפור בהיר להפרדה
+        borderRadius: '8px',
+        marginTop: '10px' 
+    },
+    subtaskRow: { 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '10px', 
+        marginBottom: '6px', 
+        cursor: 'pointer', 
+        padding: '4px 0' 
+    },
+    miniCheck: { 
+        width: '16px', 
+        height: '16px', 
+        borderRadius: '4px', // ריבוע עם פינות עגולות
+        border: '1px solid #ccc', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center' 
+    },
 
-    // --- Edit Mode Styles ---
-    editContainer: { padding: '15px', border: '1px solid #007bff', borderRadius: '8px', backgroundColor: '#fff', marginBottom: '10px' },
-    editInputTitle: { width: '100%', fontSize: '1rem', fontWeight: 'bold', padding: '8px', marginBottom: '10px', border: '1px solid #eee', borderRadius: '4px' },
-    editRow: { display: 'flex', gap: '10px', marginBottom: '10px', alignItems: 'center' },
-    editInput: { padding: '6px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '0.9rem' },
-    editSelect: { padding: '6px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '0.9rem' },
-    editTextarea: { width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '0.9rem', marginBottom: '10px', resize: 'vertical' },
-    subtasksEditBox: { backgroundColor: '#f9f9f9', padding: '10px', borderRadius: '6px', marginBottom: '10px' },
-    editSubtaskInput: { flex: 1, padding: '5px', border: '1px solid #ddd', borderRadius: '4px' },
-    iconBtn: { background: 'none', border: 'none', cursor: 'pointer' },
-    addStepBtn: { background: 'none', border: '1px dashed #007bff', color: '#007bff', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem', width: '100%' },
-    editActions: { display: 'flex', gap: '10px', justifyContent: 'flex-end' },
-    saveBtn: { backgroundColor: '#007bff', color: 'white', border: 'none', padding: '6px 15px', borderRadius: '4px', cursor: 'pointer' },
-    cancelBtn: { backgroundColor: '#eee', color: '#333', border: 'none', padding: '6px 15px', borderRadius: '4px', cursor: 'pointer' }
+    // --- Edit Mode Styles (מצב עריכה מהירה) ---
+    
+    editContainer: { 
+        padding: '15px', 
+        border: '1px solid #007bff', // מסגרת כחולה שמסמנת עריכה
+        borderRadius: '8px', 
+        backgroundColor: '#fff', 
+        marginBottom: '10px' 
+    },
+    editInputTitle: { 
+        width: '100%', 
+        fontSize: '1rem', 
+        fontWeight: 'bold', 
+        padding: '8px', 
+        marginBottom: '10px', 
+        border: '1px solid #eee', 
+        borderRadius: '4px' 
+    },
+    editRow: { 
+        display: 'flex', 
+        gap: '10px', 
+        marginBottom: '10px', 
+        alignItems: 'center' 
+    },
+    editInput: { 
+        padding: '6px', 
+        border: '1px solid #ddd', 
+        borderRadius: '4px', 
+        fontSize: '0.9rem' 
+    },
+    editSelect: { 
+        padding: '6px', 
+        border: '1px solid #ddd', 
+        borderRadius: '4px', 
+        fontSize: '0.9rem' 
+    },
+    editTextarea: { 
+        width: '100%', 
+        padding: '8px', 
+        border: '1px solid #ddd', 
+        borderRadius: '4px', 
+        fontSize: '0.9rem', 
+        marginBottom: '10px', 
+        resize: 'vertical' // מאפשר למשתמש לשנות את הגובה
+    },
+    subtasksEditBox: { 
+        backgroundColor: '#f9f9f9', 
+        padding: '10px', 
+        borderRadius: '6px', 
+        marginBottom: '10px' 
+    },
+    editSubtaskInput: { 
+        flex: 1, 
+        padding: '5px', 
+        border: '1px solid #ddd', 
+        borderRadius: '4px' 
+    },
+    iconBtn: { 
+        background: 'none', 
+        border: 'none', 
+        cursor: 'pointer' 
+    },
+    addStepBtn: { 
+        background: 'none', 
+        border: '1px dashed #007bff', // מסגרת מקווקוות
+        color: '#007bff', 
+        padding: '5px 10px', 
+        borderRadius: '4px', 
+        cursor: 'pointer', 
+        fontSize: '0.85rem', 
+        width: '100%' 
+    },
+    editActions: { 
+        display: 'flex', 
+        gap: '10px', 
+        justifyContent: 'flex-end' // מיישר את כפתורי השמירה לשמאל (או ימין תלוי ב-RTL/LTR)
+    },
+    saveBtn: { 
+        backgroundColor: '#007bff', 
+        color: 'white', 
+        border: 'none', 
+        padding: '6px 15px', 
+        borderRadius: '4px', 
+        cursor: 'pointer' 
+    },
+    cancelBtn: { 
+        backgroundColor: '#eee', 
+        color: '#333', 
+        border: 'none', 
+        padding: '6px 15px', 
+        borderRadius: '4px', 
+        cursor: 'pointer' 
+    }
 };
 
 export default TaskItem;
