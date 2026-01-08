@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { taskService } from '../../../services/taskService';
-import { FaTimes, FaMagic, FaTrash, FaMapMarkerAlt, FaClock, FaCalendarAlt, FaTag, FaChevronDown } from 'react-icons/fa';
+import { FaTimes, FaMagic, FaTrash, FaMapMarkerAlt, FaClock, FaCalendarAlt, FaTag, FaChevronDown, FaFlag, FaListUl, FaAlignLeft, FaPen, FaPlus } from 'react-icons/fa';
 
 const TAG_OPTIONS = [
     "Work 💼", "Personal 🏠", "Shopping 🛒", "Health 💪", "Finance 💰",
@@ -145,33 +145,38 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
         <div style={styles.overlay} onClick={onClose}>
             <div style={styles.modal} onClick={e => e.stopPropagation()}>
                 
-                {/* Removed Header Title, moved actions to input row */}
-                
                 <form onSubmit={handleSubmit} style={styles.form}>
                     
-                    {/* Main Input Row with Actions */}
-                    <div style={styles.inputRow}>
-                        <input
-                            type="text" placeholder="Enter new task..."
-                            value={title} onChange={(e) => setTitle(e.target.value)}
-                            style={styles.mainInput} autoFocus
-                        />
-                        
-                        <div style={styles.actions}>
-                            {taskToEdit && (
-                                <button type="button" onClick={() => { if(window.confirm('Delete?')) { onDelete(taskToEdit._id); onClose(); }}} style={styles.iconBtn} title="Delete">
-                                    <FaTrash color="#dc3545" />
-                                </button>
-                            )}
-                            <button type="button" onClick={onClose} style={styles.iconBtn}><FaTimes /></button>
+                    {/* Task Name */}
+                    <div style={styles.field}>
+                        <label style={styles.label}><FaPen /> Task Name</label>
+                        <div style={styles.inputRow}>
+                            <input
+                                type="text" placeholder="Enter new task..."
+                                value={title} onChange={(e) => setTitle(e.target.value)}
+                                style={styles.mainInput} autoFocus
+                            />
+                            
+                            <div style={styles.actions}>
+                                {taskToEdit && (
+                                    <button type="button" onClick={() => { if(window.confirm('Delete?')) { onDelete(taskToEdit._id); onClose(); }}} style={styles.iconBtn} title="Delete">
+                                        <FaTrash color="#dc3545" />
+                                    </button>
+                                )}
+                                <button type="button" onClick={onClose} style={styles.iconBtn}><FaTimes /></button>
+                            </div>
                         </div>
                     </div>
 
-                    <textarea
-                        placeholder="Add details..."
-                        value={desc} onChange={(e) => setDesc(e.target.value)}
-                        style={styles.descInput} rows={2}
-                    />
+                    {/* Details */}
+                    <div style={styles.field}>
+                        <label style={styles.label}><FaAlignLeft /> Details</label>
+                        <textarea
+                            placeholder="Add details..."
+                            value={desc} onChange={(e) => setDesc(e.target.value)}
+                            style={styles.descInput} rows={2}
+                        />
+                    </div>
 
                     {/* Meta Grid */}
                     <div style={styles.grid}>
@@ -213,11 +218,17 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
                     {/* Priority & Tags */}
                     <div style={styles.grid}>
                         <div style={styles.field}>
-                            <label style={styles.label}>Priority</label>
+                            <label style={styles.label}><FaFlag /> Priority</label>
                             <div style={styles.pills}>
                                 {['Low', 'Medium', 'High'].map(p => (
                                     <button key={p} type="button" onClick={() => setPriority(p)}
-                                        style={{...styles.pill, ...(priority === p ? styles[`pill${p}`] : {})}}>
+                                        style={{
+                                            ...styles.pill,
+                                            ...(priority === p ? styles.activePill : {}),
+                                            ...(priority === p && p === 'Low' ? { backgroundColor: '#28a745', color: 'white' } : {}),
+                                            ...(priority === p && p === 'Medium' ? { backgroundColor: '#ffc107', color: '#333' } : {}),
+                                            ...(priority === p && p === 'High' ? { backgroundColor: '#dc3545', color: 'white' } : {}),
+                                        }}>
                                         {p}
                                     </button>
                                 ))}
@@ -267,17 +278,19 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
                         </div>
                     </div>
 
-                    {/* Subtasks - AI Removed */}
-                    <div style={styles.aiBox}>
+                    {/* Subtasks */}
+                    <div style={styles.subtasksContainer}>
                         <div style={styles.aiHeader}>
-                            <span style={styles.label}>Subtasks</span>
+                            <span style={styles.label}><FaListUl /> Subtasks</span>
                         </div>
                         <div style={styles.subtaskList}>
                             {subtasks.map((step, i) => (
                                 <div key={i} style={styles.subtaskItem}>
                                     <input type="checkbox" disabled />
                                     <span>{step}</span>
-                                    <button type="button" onClick={() => setSubtasks(subtasks.filter((_, idx) => idx !== i))} style={styles.delSub}>×</button>
+                                    <button type="button" onClick={() => setSubtasks(subtasks.filter((_, idx) => idx !== i))} style={styles.iconBtn} title="Delete">
+                                        <FaTimes />
+                                    </button>
                                 </div>
                             ))}
                         </div>
@@ -286,9 +299,18 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
                                 type="text" placeholder="Add subtask manually..."
                                 value={manualStep} onChange={e => setManualStep(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addManualStep())}
-                                style={styles.subInput} 
+                                style={styles.input} 
                             />
-                            <button type="button" onClick={addManualStep} style={styles.addBtn}>+</button>
+                            <div style={styles.subtaskActions}>
+                                {manualStep && (
+                                    <button type="button" onClick={() => setManualStep('')} style={styles.iconBtn} title="Clear">
+                                        <FaTimes />
+                                    </button>
+                                )}
+                                <button type="button" onClick={addManualStep} style={styles.iconBtn} title="Add">
+                                    <FaPlus />
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -312,7 +334,7 @@ const styles = {
     actions: { display: 'flex', gap: '5px', flexShrink: 0 },
     iconBtn: { background: 'none', border: 'none', fontSize: '1.1rem', cursor: 'pointer', color: '#666', padding: '5px', borderRadius: '50%', transition: 'background 0.2s' },
 
-    descInput: { border: '1px solid #eee', borderRadius: '8px', padding: '10px', fontSize: '0.95rem', resize: 'none', outline: 'none', transition: 'border 0.2s' },
+    descInput: { border: '1px solid #eee', borderRadius: '8px', padding: '10px', fontSize: '0.95rem', resize: 'none', outline: 'none', transition: 'border 0.2s', width: '100%', boxSizing: 'border-box', fontFamily: 'inherit' },
     
     grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' },
     field: { display: 'flex', flexDirection: 'column', gap: '6px' },
@@ -321,11 +343,24 @@ const styles = {
     timeRow: { display: 'flex', alignItems: 'center', gap: '8px' },
     linkBtn: { background: 'none', border: 'none', color: '#007bff', fontSize: '0.8rem', cursor: 'pointer', whiteSpace: 'nowrap' },
 
-    pills: { display: 'flex', gap: '5px', background: '#f8f9fa', padding: '4px', borderRadius: '8px' },
-    pill: { flex: 1, border: 'none', background: 'none', padding: '6px', borderRadius: '6px', fontSize: '0.85rem', cursor: 'pointer', color: '#666', fontWeight: '500' },
-    pillLow: { backgroundColor: '#28a745', color: 'white' },
-    pillMedium: { backgroundColor: '#ffc107', color: '#333' },
-    pillHigh: { backgroundColor: '#dc3545', color: 'white' },
+    pills: { display: 'flex', gap: '4px', backgroundColor: '#f1f3f5', padding: '4px', borderRadius: '20px' },
+    pill: { 
+        flex: 1, 
+        border: 'none', 
+        background: 'transparent', 
+        padding: '7px 14px', 
+        borderRadius: '16px', 
+        fontSize: '0.8125rem', 
+        cursor: 'pointer', 
+        color: '#666', 
+        fontWeight: '500',
+        transition: 'all 0.2s ease',
+        fontFamily: 'inherit'
+    },
+    activePill: {
+        fontWeight: '700',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+    },
 
     multiSelectBtn: {
         display: 'flex',
@@ -368,15 +403,14 @@ const styles = {
     tag: { backgroundColor: '#e3f2fd', color: '#1565c0', padding: '2px 8px', borderRadius: '12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' },
     removeTag: { cursor: 'pointer', fontWeight: 'bold' },
 
-    aiBox: { backgroundColor: '#f8f9fa', padding: '12px', borderRadius: '12px', border: '1px solid #eee' },
+    subtasksContainer: { padding: '0', border: 'none', backgroundColor: 'transparent' },
     aiHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' },
     aiBtn: { backgroundColor: '#6f42c1', color: 'white', border: 'none', borderRadius: '20px', padding: '4px 12px', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' },
     subtaskList: { display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '8px' },
     subtaskItem: { display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', padding: '4px 0' },
     delSub: { background: 'none', border: 'none', color: '#999', cursor: 'pointer', marginLeft: 'auto' },
-    addSubtask: { display: 'flex', gap: '5px' },
-    subInput: { flex: 1, border: 'none', background: 'transparent', borderBottom: '1px solid #ddd', padding: '4px', fontSize: '0.9rem', outline: 'none' },
-    addBtn: { backgroundColor: '#333', color: 'white', border: 'none', borderRadius: '4px', width: '24px', height: '24px', cursor: 'pointer' },
+    addSubtask: { display: 'flex', gap: '10px', alignItems: 'center' },
+    subtaskActions: { display: 'flex', gap: '5px' },
 
     submitBtn: { marginTop: '10px', background: 'linear-gradient(135deg, #007bff, #0056b3)', color: 'white', border: 'none', padding: '12px', borderRadius: '10px', fontSize: '1rem', fontWeight: '600', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,123,255,0.2)' }
 };
