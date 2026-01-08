@@ -2,7 +2,7 @@ import React from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import TaskItem from './TaskItem';
 
-const TaskList = ({ tasks, onDelete, onUpdate, onGenerateAI, onDragEnd }) => {
+const TaskList = ({ tasks, onDelete, onUpdate, onGenerateAI, onDragEnd, onEdit }) => {
     
     // Default drag handler if none provided
     const handleDragEnd = (result) => {
@@ -37,6 +37,7 @@ const TaskList = ({ tasks, onDelete, onUpdate, onGenerateAI, onDragEnd }) => {
                                                 onDelete={onDelete}
                                                 onUpdate={onUpdate}
                                                 onGenerateAI={onGenerateAI}
+                                                onEdit={onEdit}
                                             />
                                         </div>
                                     )}

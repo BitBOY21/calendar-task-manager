@@ -8,7 +8,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { FaPlus } from 'react-icons/fa';
 
-const DashboardPage = ({ user }) => { 
+const DashboardPage = ({ user, onChangeView, onRequestDelete }) => { 
     const { tasks, addTask, updateTask, deleteTask, generateAI } = useTaskContext();
     
     const [selectedDate, setSelectedDate] = useState(null);
@@ -27,6 +27,10 @@ const DashboardPage = ({ user }) => {
             newTask.dueDate = localISOTime;
         }
         await addTask(newTask);
+    };
+
+    const handleEditTask = (task) => {
+        setEditingTask(task);
     };
 
     const todayTasks = tasks.filter(t => {
@@ -70,9 +74,10 @@ const DashboardPage = ({ user }) => {
                         {sortedTodayTasks.length > 0 ? (
                             <TaskList
                                 tasks={sortedTodayTasks}
-                                onDelete={deleteTask}
+                                onDelete={onRequestDelete || deleteTask} // Use onRequestDelete if available (for modals), fallback to direct delete
                                 onUpdate={updateTask}
                                 onGenerateAI={generateAI}
+                                onEdit={handleEditTask}
                             />
                         ) : (
                             <div style={styles.emptyState}>
@@ -103,7 +108,8 @@ const DashboardPage = ({ user }) => {
                 }}
                 onAdd={handleAddTask}
                 onUpdate={updateTask}
-                onDelete={deleteTask}
+                onRequestDelete={onRequestDelete} // Pass the modal handler
+                onDelete={deleteTask} // Fallback
                 taskToEdit={editingTask}
                 initialDate={selectedDate} 
             />

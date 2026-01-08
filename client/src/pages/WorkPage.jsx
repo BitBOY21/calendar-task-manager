@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { useTaskContext } from '../context/TaskContext'; 
-import CalendarView from '../features/tasks/components/CalendarView'; 
-import TaskList from '../features/tasks/components/TaskList'; 
-import TaskFilters from '../features/tasks/components/TaskFilters'; 
-import TaskForm from '../features/tasks/components/TaskForm'; 
+import { useTaskContext } from '../context/TaskContext';
+import CalendarView from '../features/tasks/components/CalendarView';
+import TaskList from '../features/tasks/components/TaskList';
+import TaskFilters from '../features/tasks/components/TaskFilters';
+import TaskForm from '../features/tasks/components/TaskForm';
 import Card from '../components/ui/Card';
 import { isToday, isThisWeek, isThisMonth, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 
-const WorkPage = ({ onDateSelect, onEventDrop, onEventClick, onRequestDelete }) => { 
+const WorkPage = ({ onDateSelect, onEventDrop, onEventClick, onRequestDelete }) => {
     const { tasks, updateTask, deleteTask } = useTaskContext();
-    
+
     const [filters, setFilters] = useState({
         status: 'all',
         priority: 'all',
@@ -26,10 +26,10 @@ const WorkPage = ({ onDateSelect, onEventDrop, onEventClick, onRequestDelete }) 
         // Status Filter
         if (filters.status === 'active' && task.isCompleted) return false;
         if (filters.status === 'completed' && !task.isCompleted) return false;
-        
+
         // Priority Filter
         if (filters.priority !== 'all' && task.priority !== filters.priority) return false;
-        
+
         // Tags Filter
         if (filters.tags.length > 0) {
             const hasTag = task.tags && task.tags.some(t => filters.tags.includes(t));
@@ -61,7 +61,7 @@ const WorkPage = ({ onDateSelect, onEventDrop, onEventClick, onRequestDelete }) 
                     if (filters.customStartDate && filters.customEndDate) {
                         const start = startOfDay(new Date(filters.customStartDate));
                         const end = endOfDay(new Date(filters.customEndDate));
-                        
+
                         // Check if task date is within the range [start, end]
                         if (!isWithinInterval(taskDate, { start, end })) return false;
                     } else if (filters.customStartDate) {
@@ -90,22 +90,22 @@ const WorkPage = ({ onDateSelect, onEventDrop, onEventClick, onRequestDelete }) 
         <div style={styles.container}>
             {/* --- Left: Calendar --- */}
             <Card style={styles.calendarArea}>
-                <CalendarView 
-                    tasks={filteredTasks} 
+                <CalendarView
+                    tasks={filteredTasks}
                     onDateSelect={onDateSelect}
                     onEventDrop={onEventDrop}
-                    onEventClick={handleEventClick} 
-                    unified={true} 
+                    onEventClick={handleEventClick}
+                    unified={true}
                 />
             </Card>
 
             {/* --- Right: Sidebar (Filters + Tasks) --- */}
             <Card style={styles.sidebarArea}>
                 <div style={styles.filtersSection}>
-                    <TaskFilters 
+                    <TaskFilters
                         filters={filters}
                         setFilters={setFilters}
-                        selectedDate={null} 
+                        selectedDate={null}
                         onClearDate={() => {}}
                         showTitle={true}
                     />
@@ -116,11 +116,11 @@ const WorkPage = ({ onDateSelect, onEventDrop, onEventClick, onRequestDelete }) 
                 <div style={styles.tasksSection}>
                     <h3 style={styles.listTitle}>Tasks ({filteredTasks.length})</h3>
                     <div style={styles.taskListWrapper}>
-                        <TaskList 
-                            tasks={filteredTasks} 
+                        <TaskList
+                            tasks={filteredTasks}
                             onUpdate={updateTask}
                             onDelete={deleteTask}
-                            onDragEnd={() => {}} 
+                            onDragEnd={() => {}}
                         />
                     </div>
                 </div>
@@ -128,13 +128,13 @@ const WorkPage = ({ onDateSelect, onEventDrop, onEventClick, onRequestDelete }) 
 
             {/* Edit Modal */}
             {editingTask && (
-                <TaskForm 
+                <TaskForm
                     isOpen={!!editingTask}
                     taskToEdit={editingTask}
                     onClose={() => setEditingTask(null)}
                     onUpdate={updateTask}
                     onRequestDelete={onRequestDelete}
-                    onAdd={() => {}} 
+                    onAdd={() => {}}
                 />
             )}
         </div>
@@ -150,43 +150,43 @@ const styles = {
         padding: '20px',
         overflow: 'hidden',
         // Removed backgroundColor
-        maxWidth: '1600px', 
+        maxWidth: '1600px',
         margin: '0 auto'
     },
-    
-    calendarArea: { 
-        flex: 3, 
-        overflow: 'hidden', 
-        display: 'flex', 
+
+    calendarArea: {
+        flex: 3,
+        overflow: 'hidden',
+        display: 'flex',
         flexDirection: 'column',
         height: '100%',
         padding: '20px'
     },
 
-    sidebarArea: { 
-        flex: 1, 
+    sidebarArea: {
+        flex: 1,
         minWidth: '320px',
         maxWidth: '450px', // Increased width
-        display: 'flex', 
-        flexDirection: 'column', 
+        display: 'flex',
+        flexDirection: 'column',
         overflow: 'hidden',
         height: '100%',
-        padding: '0' 
+        padding: '0'
     },
-    
+
     filtersSection: {
         flexShrink: 0,
         maxHeight: '60%',
         overflowY: 'auto',
         padding: '20px'
     },
-    
+
     divider: {
         height: '1px',
         backgroundColor: '#f0f0f0',
         flexShrink: 0
     },
-    
+
     tasksSection: {
         flex: 1,
         display: 'flex',

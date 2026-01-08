@@ -4,7 +4,7 @@ import { FaCheck, FaClock, FaMapMarkerAlt, FaEdit, FaTrash, FaChevronDown, FaChe
 // Same tags as in the form
 const TAG_OPTIONS = ["Work 💼", "Personal 🏠", "Shopping 🛒", "Health 💪", "Finance 💰", "Study 📚", "Urgent 🔥", "Family 👨‍👩‍👧‍👦", "Errands 🏃"];
 
-const TaskItem = ({ task, onDelete, onUpdate }) => {
+const TaskItem = ({ task, onDelete, onUpdate, onEdit }) => {
     const [localSubtasks, setLocalSubtasks] = useState(task.subtasks || []);
     const [isExpanded, setIsExpanded] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -171,7 +171,7 @@ const TaskItem = ({ task, onDelete, onUpdate }) => {
 
     // --- Render View Mode (Compact Design) ---
     return (
-        <div style={styles.taskRow} className="task-row-hover">
+        <div style={styles.taskRow} className="task-row-hover" onClick={() => setIsExpanded(!isExpanded)}>
             {/* 1. Check Circle */}
             <div 
                 onClick={handleQuickComplete}
@@ -190,8 +190,9 @@ const TaskItem = ({ task, onDelete, onUpdate }) => {
                 }} />
             </div>
 
-            {/* 2. Task Info */}
-            <div style={styles.taskInfo} onClick={() => setIsExpanded(!isExpanded)}>
+            {/* 2. Center Content */}
+            <div style={styles.centerContent}>
+                {/* Row 1: Title */}
                 <span style={{
                     ...styles.taskTitle,
                     textDecoration: task.isCompleted ? 'line-through' : 'none',
@@ -200,62 +201,72 @@ const TaskItem = ({ task, onDelete, onUpdate }) => {
                     {task.title}
                 </span>
                 
-                <div style={styles.taskMeta}>
+                {/* Row 2: Metadata (Priority + Date + Time + Location) */}
+                <div style={styles.metaRow}>
+                    <span style={{
+                        ...styles.priorityPill,
+                        backgroundColor: getPriorityColor(task.priority),
+                        color: getPriorityTextColor(task.priority),
+                    }}>
+                        {task.priority}
+                    </span>
+
                     {task.dueDate && (
-                        <>
-                            <span style={styles.metaItem}>
-                                <FaCalendarAlt style={{fontSize: '0.7rem', marginRight: '4px', color: '#888'}} />
-                                {new Date(task.dueDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit'})}
-                            </span>
-                            <span style={styles.metaItem}>
-                                <FaClock style={{fontSize: '0.7rem', marginRight: '4px', color: '#888'}} />
-                                {new Date(task.dueDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                            </span>
-                        </>
+                        <span style={styles.metaItem}>
+                            <FaCalendarAlt style={{fontSize: '0.7rem'}} />
+                            {new Date(task.dueDate).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit'})}
+                        </span>
                     )}
+                    
+                    {task.dueDate && (
+                        <span style={styles.metaItem}>
+                            <FaClock style={{fontSize: '0.7rem'}} />
+                            {new Date(task.dueDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </span>
+                    )}
+
                     {task.location && (
                         <span style={styles.metaItem}>
-                            <FaMapMarkerAlt style={{fontSize: '0.7rem', marginRight: '4px', color: '#888'}} />
+                            <FaMapMarkerAlt style={{fontSize: '0.7rem'}} />
                             {task.location}
                         </span>
                     )}
                 </div>
             </div>
 
-            {/* 3. Actions & Priority */}
-            <div style={styles.rightSide}>
-                <div style={styles.hoverActions}>
-                    <button onClick={() => setIsEditing(true)} style={styles.iconActionBtn} title="Edit"><FaEdit /></button>
-                    <button 
-                        onClick={(e) => {
-                            e.stopPropagation(); // Prevent expanding the task
-                            // Ensure we send the ID as a string. If it's an object, convert it.
-                            const idToSend = typeof task._id === 'object' ? task._id.toString() : task._id;
-                            onDelete(idToSend); 
-                        }} 
-                        style={styles.iconActionBtn} 
-                        title="Delete"
-                    >
-                        <FaTrash />
-                    </button>
-                </div>
-
-                <span style={{
-                    ...styles.priorityTag,
-                    backgroundColor: getPriorityColor(task.priority),
-                    color: getPriorityTextColor(task.priority),
-                }}>
-                    {task.priority}
-                </span>
-                
-                <button onClick={() => setIsExpanded(!isExpanded)} style={styles.expandBtn}>
-                    {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+            {/* 3. Right Side (Actions) */}
+            <div style={styles.rightActions}>
+                <button 
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (onEdit) {
+                            onEdit(task);
+                        } else {
+                            setIsEditing(true);
+                        }
+                    }} 
+                    style={styles.actionIconBtn} 
+                    title="Edit"
+                >
+                    <FaEdit />
+                </button>
+                <button 
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        // Ensure we send the ID as a string. If it's an object, convert it.
+                        const idToSend = typeof task._id === 'object' ? task._id.toString() : task._id;
+                        onDelete(idToSend); 
+                    }} 
+                    style={styles.actionIconBtn} 
+                    title="Delete"
+                >
+                    <FaTrash />
                 </button>
             </div>
 
-            {/* 4. Expanded Details */}
+            {/* 4. Expanded Details (Conditional) */}
             {isExpanded && (
-                <div style={styles.expandedDetails}>
+                <div style={styles.expandedDetails} onClick={(e) => e.stopPropagation()}>
                     {task.description && <div style={styles.descText}>{task.description}</div>}
                     
                     {task.tags && task.tags.length > 0 && (
@@ -298,19 +309,21 @@ const styles = {
     taskRow: {
         display: 'flex',
         flexWrap: 'wrap',
-        alignItems: 'center',
-        padding: '8px 10px', // Reduced padding for compactness
-        borderBottom: '1px solid #f5f5f5',
+        alignItems: 'flex-start', // Align to top for multi-line content
+        padding: '12px 16px',
+        borderBottom: '1px solid #f0f0f0',
         backgroundColor: 'white',
         transition: 'background-color 0.2s ease',
-        position: 'relative'
+        position: 'relative',
+        cursor: 'pointer',
+        gap: '12px'
     },
     checkCircle: {
-        width: '18px', // Smaller check circle
-        height: '18px',
+        width: '20px',
+        height: '20px',
         borderRadius: '50%',
         border: '2px solid #ddd',
-        marginRight: '10px',
+        marginTop: '2px', // Align with first line of text
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
@@ -318,31 +331,85 @@ const styles = {
         transition: 'all 0.2s',
         flexShrink: 0,
     },
-    checkIcon: { fontSize: '9px' },
+    checkIcon: { fontSize: '10px' },
     
-    taskInfo: { flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', cursor: 'pointer', minWidth: '120px' }, // Reduced gap
-    taskTitle: { fontSize: '0.9rem', fontWeight: '600', color: '#333', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }, // Slightly smaller font
-    taskMeta: { fontSize: '0.7rem', color: '#888', display: 'flex', alignItems: 'center', gap: '8px' }, // Smaller font and gap
-    metaItem: { display: 'flex', alignItems: 'center' },
+    centerContent: {
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '4px',
+        minWidth: 0 // Allow text truncation
+    },
+    taskTitle: {
+        fontSize: '1rem',
+        fontWeight: '500',
+        color: '#333',
+        lineHeight: '1.4'
+    },
+    metaRow: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px', // Increased gap for better separation
+        fontSize: '0.75rem',
+        color: '#666',
+        flexWrap: 'wrap'
+    },
+    priorityPill: {
+        padding: '1px 6px',
+        borderRadius: '4px',
+        fontSize: '0.65rem',
+        fontWeight: '600',
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px'
+    },
+    metaItem: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px'
+    },
 
-    rightSide: { display: 'flex', alignItems: 'center', gap: '8px' },
-    priorityTag: { padding: '2px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: '700', minWidth: '50px', textAlign: 'center' }, // Smaller tag
-    
-    hoverActions: { display: 'flex', gap: '4px', opacity: 0, transition: 'opacity 0.2s' }, 
-    iconActionBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#999', fontSize: '0.8rem', padding: '4px' },
-    expandBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontSize: '0.75rem', padding: '4px' },
+    rightActions: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        opacity: 0.6, // Subtle by default
+        transition: 'opacity 0.2s'
+    },
+    actionIconBtn: {
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        color: '#999',
+        fontSize: '0.9rem',
+        padding: '6px',
+        borderRadius: '4px',
+        transition: 'all 0.2s',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        ':hover': {
+            backgroundColor: '#f5f5f5',
+            color: '#333'
+        }
+    },
 
     // --- Expanded Details ---
-    expandedDetails: { width: '100%', marginTop: '8px', paddingLeft: '30px', paddingRight: '10px', animation: 'fadeIn 0.2s ease' },
-    descText: { fontSize: '0.85rem', color: '#555', marginBottom: '8px', lineHeight: '1.4' },
-    tagsRow: { display: 'flex', gap: '4px', marginBottom: '8px', flexWrap: 'wrap' },
-    tagPill: { backgroundColor: '#f1f3f5', color: '#555', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '8px' },
+    expandedDetails: {
+        width: '100%',
+        marginTop: '12px',
+        paddingLeft: '32px', // Indent to align with text
+        animation: 'fadeIn 0.2s ease',
+        cursor: 'default'
+    },
+    descText: { fontSize: '0.9rem', color: '#555', marginBottom: '10px', lineHeight: '1.5' },
+    tagsRow: { display: 'flex', gap: '6px', marginBottom: '10px', flexWrap: 'wrap' },
+    tagPill: { backgroundColor: '#e9ecef', color: '#495057', fontSize: '0.75rem', padding: '2px 8px', borderRadius: '12px' },
     
-    subtasksList: { backgroundColor: '#f8f9fa', padding: '8px', borderRadius: '6px' },
-    progressBar: { height: '3px', backgroundColor: '#e9ecef', borderRadius: '2px', overflow: 'hidden', marginBottom: '6px' },
+    subtasksList: { backgroundColor: '#f8f9fa', padding: '10px', borderRadius: '8px', marginTop: '10px' },
+    progressBar: { height: '4px', backgroundColor: '#e9ecef', borderRadius: '2px', overflow: 'hidden', marginBottom: '8px' },
     progressFill: { height: '100%', backgroundColor: '#28a745', transition: 'width 0.3s ease' },
-    subtaskRow: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', cursor: 'pointer' },
-    miniCheck: { width: '14px', height: '14px', borderRadius: '3px', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+    subtaskRow: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px', cursor: 'pointer', padding: '4px 0' },
+    miniCheck: { width: '16px', height: '16px', borderRadius: '4px', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' },
 
     // --- Edit Mode Styles ---
     editContainer: { padding: '15px', border: '1px solid #007bff', borderRadius: '8px', backgroundColor: '#fff', marginBottom: '10px' },
