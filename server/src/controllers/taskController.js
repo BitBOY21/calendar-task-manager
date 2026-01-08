@@ -33,7 +33,26 @@ const createTask = asyncHandler(async (req, res) => {
     // Scenario B: Recurring Task
     const recurrenceId = crypto.randomUUID();
     const tasksToCreate = [];
-    const instancesCount = 12; // Generate 12 instances
+    
+    // Determine number of instances based on recurrence type
+    let instancesCount = 12; // Default fallback
+    
+    switch (recurrence) {
+        case 'daily':
+            instancesCount = 365; // 1 year
+            break;
+        case 'weekly':
+            instancesCount = 52; // 1 year
+            break;
+        case 'monthly':
+            instancesCount = 24; // 2 years
+            break;
+        case 'yearly':
+            instancesCount = 5; // 5 years
+            break;
+        default:
+            instancesCount = 12;
+    }
 
     let currentDueDate = dueDate ? new Date(dueDate) : null;
     let currentEndDate = endDate ? new Date(endDate) : null;
