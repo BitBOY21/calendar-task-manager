@@ -185,13 +185,13 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
                         <div style={styles.field}>
                             <label style={styles.label}><FaCalendarAlt /> Date</label>
                             <div style={styles.timeRow}>
-                                <input type="date" value={dateStr} onChange={e => setDateStr(e.target.value)} style={styles.input} />
+                                <input type="date" value={dateStr} onChange={e => setDateStr(e.target.value)} style={styles.dateInput} />
                                 {!showEndDate ? (
                                     <button type="button" onClick={() => setShowEndDate(true)} style={styles.linkBtn}>+ End Date</button>
                                 ) : (
                                     <>
                                         <span style={{color:'#999'}}>to</span>
-                                        <input type="date" value={endDateStr} onChange={e => setEndDateStr(e.target.value)} style={styles.input} />
+                                        <input type="date" value={endDateStr} onChange={e => setEndDateStr(e.target.value)} style={styles.dateInput} />
                                     </>
                                 )}
                             </div>
@@ -214,13 +214,13 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
                             <label style={styles.label}><FaClock /> Time</label>
                             {!isAllDay ? (
                                 <div style={styles.timeRow}>
-                                    <input type="time" value={timeStr} onChange={e => setTimeStr(e.target.value)} style={styles.input} />
+                                    <input type="time" value={timeStr} onChange={e => setTimeStr(e.target.value)} style={styles.timeInput} />
                                     {!showEndTime ? (
                                         <button type="button" onClick={() => setShowEndTime(true)} style={styles.linkBtn}>+ End Time</button>
                                     ) : (
                                         <>
                                             <span style={{color:'#999'}}>to</span>
-                                            <input type="time" value={endTimeStr} onChange={e => setEndTimeStr(e.target.value)} style={styles.input} />
+                                            <input type="time" value={endTimeStr} onChange={e => setEndTimeStr(e.target.value)} style={styles.timeInput} />
                                         </>
                                     )}
                                 </div>
@@ -456,6 +456,32 @@ const styles = {
         boxSizing: 'border-box',
         fontFamily: 'inherit',
         backgroundColor: '#f9f9f9' // רקע אפור בהיר מאוד להפרדה
+    },
+
+    // שדה קלט לתאריך (רחב יותר)
+    dateInput: {
+        padding: '10px 12px',
+        borderRadius: '10px',
+        border: '1px solid #eee', 
+        fontSize: '0.95rem',
+        outline: 'none', 
+        width: '137px', // כאן משנים את רוחב התאריך
+        boxSizing: 'border-box',
+        fontFamily: 'inherit',
+        backgroundColor: '#f9f9f9'
+    },
+
+    // שדה קלט לשעה (צר יותר)
+    timeInput: {
+        padding: '10px 12px',
+        borderRadius: '10px',
+        border: '1px solid #eee', 
+        fontSize: '0.95rem',
+        outline: 'none', 
+        width: '100px', // כאן משנים את רוחב השעה
+        boxSizing: 'border-box',
+        fontFamily: 'inherit',
+        backgroundColor: '#f9f9f9'
     },
 
     // --- 4. כפתורים ופעולות (Buttons & Actions) ---
