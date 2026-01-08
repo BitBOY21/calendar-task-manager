@@ -98,6 +98,15 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
         }
     }, [showEndDate]);
 
+    // Effect to validate End Date against Start Date
+    useEffect(() => {
+        if (showEndDate && dateStr && endDateStr) {
+            if (endDateStr < dateStr) {
+                setEndDateStr(dateStr);
+            }
+        }
+    }, [dateStr, endDateStr, showEndDate]);
+
     const resetForm = () => {
         setTitle(''); setDesc(''); setLocation(''); setTags([]);
         setTimeStr(''); setEndTimeStr(''); setShowEndTime(false);
@@ -209,7 +218,13 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onDelete, taskToEdit, init
                                 ) : (
                                     <>
                                         <span style={{color:'#999'}}>to</span>
-                                        <input type="date" value={endDateStr} onChange={e => setEndDateStr(e.target.value)} style={styles.dateInput} />
+                                        <input 
+                                            type="date" 
+                                            value={endDateStr} 
+                                            min={dateStr} // Prevent selecting date before start date
+                                            onChange={e => setEndDateStr(e.target.value)} 
+                                            style={styles.dateInput} 
+                                        />
                                     </>
                                 )}
                             </div>
