@@ -9,7 +9,6 @@ const {
     createTask,
     updateTask,
     deleteTask,
-    generateAiSuggestions,
     reorderTasks
 } = require('../controllers/taskController');
 
@@ -23,7 +22,5 @@ router.route('/')
 router.route('/:id')
     .put(protect, validate(taskUpdateSchema), updateTask) // Use update schema (all fields optional)
     .delete(protect, deleteTask);
-
-router.post('/:id/ai-assist', protect, generateAiSuggestions);
 
 module.exports = router;

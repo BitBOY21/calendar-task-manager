@@ -137,11 +137,6 @@ const deleteTask = asyncHandler(async (req, res) => {
     }
 });
 
-const generateAiSuggestions = asyncHandler(async (req, res) => {
-    const task = await taskService.generateAiSuggestions(req.user.id, req.params.id);
-    res.status(200).json(task);
-});
-
 const reorderTasks = asyncHandler(async (req, res) => {
     const result = await taskService.reorderTasks(req.user.id, req.body.tasks);
     res.status(200).json(result);
@@ -152,6 +147,5 @@ module.exports = {
     createTask,
     updateTask,
     deleteTask,
-    generateAiSuggestions,
     reorderTasks
 };

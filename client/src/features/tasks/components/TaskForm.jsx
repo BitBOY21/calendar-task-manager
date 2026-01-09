@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { taskService } from '../../../services/taskService';
-import { FaTimes, FaMagic, FaTrash, FaMapMarkerAlt, FaClock, FaCalendarAlt, FaTag, FaChevronDown, FaFlag, FaListUl, FaAlignLeft, FaPen, FaPlus, FaRedo } from 'react-icons/fa';
+import { FaTimes, FaTrash, FaMapMarkerAlt, FaClock, FaCalendarAlt, FaTag, FaChevronDown, FaFlag, FaListUl, FaAlignLeft, FaPen, FaPlus, FaRedo } from 'react-icons/fa';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 
 const TAG_OPTIONS = [
@@ -20,7 +20,6 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onRequestDelete, taskToEdi
     const [showEndTime, setShowEndTime] = useState(false);
     const [location, setLocation] = useState('');
     const [subtasks, setSubtasks] = useState([]); 
-    const [loadingAI, setLoadingAI] = useState(false);
     const [manualStep, setManualStep] = useState('');
     const [tags, setTags] = useState([]);
     const [isAllDay, setIsAllDay] = useState(false);
@@ -120,16 +119,6 @@ const TaskForm = ({ isOpen, onClose, onAdd, onUpdate, onRequestDelete, taskToEdi
         if (!dResult) return null;
         const timeToUse = tResult || '09:00'; 
         return new Date(`${dResult}T${timeToUse}`).toISOString();
-    };
-
-    const handleAiBreakdown = async () => {
-        if (!title.trim()) return;
-        setLoadingAI(true);
-        try {
-            const steps = await taskService.getAiBreakdown(title);
-            setSubtasks(prev => [...prev, ...steps]);
-        } catch (error) { alert("AI Failed"); } 
-        finally { setLoadingAI(false); }
     };
 
     const handleSubmit = (e) => {

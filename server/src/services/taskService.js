@@ -1,5 +1,4 @@
 const Task = require('../models/Task');
-const aiService = require('./aiService');
 const { calculateUrgency } = require('../utils/taskUtils');
 
 // --- Service Functions ---
@@ -76,18 +75,6 @@ const deleteTask = async (userId, taskId) => {
     return { id: taskId, message: 'Task deleted successfully' };
 };
 
-const generateAiSuggestions = async (userId, taskId) => {
-    const task = await Task.findById(taskId);
-    if (!task) throw new Error('Task not found');
-    if (task.user.toString() !== userId) throw new Error('User not authorized');
-
-    // Use the centralized AI service
-    const suggestions = await aiService.generateBreakdown(task.title);
-
-    task.aiSuggestions = suggestions;
-    return await task.save();
-};
-
 const reorderTasks = async (userId, tasksOrder) => {
     const bulkOps = tasksOrder.map((item, index) => ({
         updateOne: {
@@ -106,6 +93,5 @@ module.exports = {
     createTask,
     updateTask,
     deleteTask,
-    generateAiSuggestions,
     reorderTasks
 };

@@ -39,7 +39,6 @@ app.get('/', (req, res) => {
 // 2. API Routes
 app.use('/api/tasks', require('./routes/taskRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/ai', require('./routes/aiRoutes'));
 
 // 3. Error Handling Middleware (Must be last)
 app.use(errorHandler);
