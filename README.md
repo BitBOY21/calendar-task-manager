@@ -150,16 +150,16 @@ MasterTasker/
 ## 📸 Screenshots
 
 ### Home Page
-![Home Page View](./screenshot/Home page.png)
+![Home Page View](./screenshot/HomePage.png)
 
 ### Calendar Page
 ![Calendar Work View](./screenshot/Calendar.png)
 
 ### Summary Page
-![Summary Page View](./screenshot/Summary Page.png)
+![Summary Page View](./screenshot/SummaryPage.png)
 
 ### History Page
-![History Page View](./screenshot/History Page.png)
+![History Page View](./screenshot/HistoryPage.png)
 
 ### Add/Edit Task 
 ![Add/Edit Task View](./screenshot/Add+Edit_Task.png)
