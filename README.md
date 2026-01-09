@@ -105,6 +105,28 @@ The easiest way to run MasterTasker is using Docker Compose.
 
 ---
 
+## 📸 Screenshots
+
+### Home Page
+![Home Page View](./screenshot/HomePage.png)
+
+### Calendar Page
+![Calendar Work View](./screenshot/Calendar.png)
+
+### Summary Page
+![Summary Page View](./screenshot/SummaryPage.png)
+
+### History Page
+![History Page View](./screenshot/HistoryPage.png)
+
+### Add/Edit Task 
+![Add/Edit Task View](./screenshot/Add+Edit_Task.png)
+
+### Login/Carte Account 
+![Add/Edit Task View](./screenshot/Login+Carte_Account.png)
+
+---
+
 ## 📂 Project Structure
 
 ```bash
@@ -145,27 +167,6 @@ MasterTasker/
 | `NODE_ENV` | Environment mode | `development` | `server/.env` |
 | `VITE_API_URL` | Backend URL for Frontend | `http://localhost:5000/api` | `client/.env` |
 
----
-
-## 📸 Screenshots
-
-### Home Page
-![Home Page View](./screenshot/HomePage.png)
-
-### Calendar Page
-![Calendar Work View](./screenshot/Calendar.png)
-
-### Summary Page
-![Summary Page View](./screenshot/SummaryPage.png)
-
-### History Page
-![History Page View](./screenshot/HistoryPage.png)
-
-### Add/Edit Task 
-![Add/Edit Task View](./screenshot/Add+Edit_Task.png)
-
-### Login/Carte Account 
-![Add/Edit Task View](./screenshot/Login+Carte_Account.png)
 ---
 
 ## 📄 License
