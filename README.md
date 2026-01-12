@@ -6,19 +6,12 @@
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-5.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 
-> **A Next-Generation Productivity Platform combining Task Management, Calendar Scheduling, and Analytics in a unified Glassmorphism UI.**
+## About
 
----
+A simple and intuitive calendar and task management app built to help users stay organized without overcomplicating their workflow.  
+This project focuses on clean design, practical features, and a smooth user experience for everyday planning.
 
-## 📖 About
-
-**MasterTasker** isn't just another to-do list. It solves the fragmentation problem between task managers and calendars. Instead of managing lists in one app and schedules in another, MasterTasker treats tasks as time-bound events.
-
-Built with a focus on **Developer Experience (DX)** and **User Experience (UX)**, it features a robust recurring task engine (similar to Google Calendar), a drag-and-drop interface, and deep analytics to track productivity trends.
-
----
-
-## ✨ Key Features
+## Key Features
 
 *   **📅 Unified Calendar & Tasks:** Seamlessly switch between list views and monthly/weekly calendar views.
 *   **🔁 Smart Recurrence Engine:** Complex recurring logic (Daily, Weekly, Monthly, Yearly) handled natively in the backend.
@@ -29,14 +22,10 @@ Built with a focus on **Developer Experience (DX)** and **User Experience (UX)**
 *   **🔐 Secure Authentication:** JWT-based stateless authentication with Bcrypt password hashing.
 *   **🐳 Dockerized:** Fully containerized environment for easy deployment and development.
 
----
-
 ### Calendar Page
 ![Calendar Work View](./screenshot/Calendar.png)
 
----
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### **Frontend (Client)**
 *   **Framework:** React 19 (via Vite)
@@ -60,9 +49,7 @@ Built with a focus on **Developer Experience (DX)** and **User Experience (UX)**
 *   **Containerization:** Docker & Docker Compose
 *   **Hot Reloading:** Vite (Client) + Nodemon (Server) inside Docker
 
----
-
-## 🚀 Getting Started (Docker)
+## Getting Started (Docker)
 
 The easiest way to run MasterTasker is using Docker Compose.
 
@@ -103,31 +90,27 @@ The easiest way to run MasterTasker is using Docker Compose.
     docker-compose exec server npm run seed
     ```
 
----
+## Screenshots
 
-## 📸 Screenshots
-
-### Home Page
+### Home Page:
 ![Home Page View](./screenshot/HomePage.png)
 
-### Calendar Page
+### Calendar Page:
 ![Calendar Work View](./screenshot/Calendar.png)
 
-### Summary Page
+### Summary Page:
 ![Summary Page View](./screenshot/SummaryPage.png)
 
-### History Page
+### History Page:
 ![History Page View](./screenshot/HistoryPage.png)
 
-### Add/Edit Task 
+### Add/Edit Task:
 ![Add/Edit Task View](./screenshot/Add+Edit_Task.png)
 
-### Login/Carte Account 
+### Login/Carte Account: 
 ![Add/Edit Task View](./screenshot/Login+Carte_Account.png)
 
----
-
-## 📂 Project Structure
+## Project Structure
 
 ```bash
 MasterTasker/
@@ -155,9 +138,7 @@ MasterTasker/
 └── docker-compose.yml      # Orchestration
 ```
 
----
-
-## 🔑 Environment Variables
+## Environment Variables
 
 | Variable | Description | Default (Dev) | Location |
 | :--- | :--- | :--- | :--- |
@@ -167,8 +148,6 @@ MasterTasker/
 | `NODE_ENV` | Environment mode | `development` | `server/.env` |
 | `VITE_API_URL` | Backend URL for Frontend | `http://localhost:5000/api` | `client/.env` |
 
----
-
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
