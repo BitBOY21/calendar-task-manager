@@ -60,7 +60,7 @@ The easiest way to run the project locally is using Docker.
 ### Run the Project
 
 ```bash
-git clone https://github.com/your-username/MasterTasker.git
+git clone https://github.com/BitBOY21/MasterTasker.git
 cd MasterTasker
 docker-compose up --build
 ```
