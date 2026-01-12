@@ -13,41 +13,34 @@ This project focuses on clean design, practical features, and a smooth user expe
 
 ## Key Features
 
-*   **📅 Unified Calendar & Tasks:** Seamlessly switch between list views and monthly/weekly calendar views.
-*   **🔁 Smart Recurrence Engine:** Complex recurring logic (Daily, Weekly, Monthly, Yearly) handled natively in the backend.
-*   **✋ Drag & Drop Interface:** Powered by `@hello-pangea/dnd` for intuitive task reordering and calendar scheduling.
-*   **📊 Productivity Analytics:** Visual insights using `Recharts` to track completion rates, priority distribution, and activity logs.
-*   **⚡ Optimistic UI:** Instant feedback on user actions (like checking off a task) before the server responds.
-*   **🔍 Advanced Filtering:** Filter by multiple tags, priority levels, date ranges, and status simultaneously.
-*   **🔐 Secure Authentication:** JWT-based stateless authentication with Bcrypt password hashing.
-*   **🐳 Dockerized:** Fully containerized environment for easy deployment and development.
+* **Calendar & Task Views**
+  Switch easily between list views and weekly/monthly calendar views.
+* **Recurring Tasks**
+  Support for daily, weekly, monthly, and yearly recurring tasks handled on the backend.
+* **Drag & Drop**
+  Intuitive task reordering and calendar scheduling using drag and drop.
+* **Productivity Insights**
+  Simple charts that help visualize task completion and priorities.
+* **Optimistic UI**
+  Instant feedback for user actions, making the app feel fast and responsive.
+* **Authentication**
+  Secure JWT-based authentication with hashed passwords.
+* **Docker Ready**
+  Fully containerized for easy setup and consistent development environments.
 
-### Calendar Page
+## Screenshots
+
+### Calendar View:
 ![Calendar Work View](./screenshot/Calendar.png)
 
-## Tech Stack
+### Home Page:
+![Home Page View](./screenshot/HomePage.png)
 
-### **Frontend (Client)**
-*   **Framework:** React 19 (via Vite)
-*   **Routing:** React Router DOM v7
-*   **State Management:** React Context API + Custom Hooks (`useTasks`)
-*   **Styling:** CSS Modules with Glassmorphism Design System
-*   **Calendar:** `react-big-calendar` + `date-fns`
-*   **Drag & Drop:** `@hello-pangea/dnd`
-*   **Charts:** `recharts`
-*   **HTTP Client:** `axios`
+### Summary:
+![Summary Page View](./screenshot/SummaryPage.png)
 
-### **Backend (Server)**
-*   **Runtime:** Node.js
-*   **Framework:** Express.js
-*   **Database:** MongoDB (Mongoose ODM)
-*   **Validation:** Joi
-*   **Security:** Helmet, XSS-Clean, Mongo-Sanitize, CORS
-*   **Auth:** JSON Web Tokens (JWT)
-
-### **DevOps**
-*   **Containerization:** Docker & Docker Compose
-*   **Hot Reloading:** Vite (Client) + Nodemon (Server) inside Docker
+### Add/Edit Task:
+![Add/Edit Task View](./screenshot/Add+Edit_Task.png)
 
 ## Getting Started (Docker)
 
@@ -56,98 +49,55 @@ The easiest way to run MasterTasker is using Docker Compose.
 ### Prerequisites
 *   Docker Desktop installed and running.
 
-### Installation Steps
+## Getting Started (Docker)
 
-1.  **Clone the repository**
-    ```bash
-    git clone https://github.com/your-username/MasterTasker.git
-    cd MasterTasker
-    ```
+The easiest way to run the project locally is using Docker.
 
-2.  **Configure Environment Variables**
-    Create a `.env` file in the `server/` directory (or rely on the defaults in `docker-compose.yml` for dev):
-    ```bash
-    # server/.env
-    PORT=5000
-    MONGO_URI=mongodb://mongo:27017/mastertasker
-    JWT_SECRET=your_super_secret_key_123
-    NODE_ENV=development
-    ```
+### Prerequisites
 
-3.  **Run with Docker Compose**
-    ```bash
-    docker-compose up --build
-    ```
+* Docker Desktop
 
-4.  **Access the Application**
-    *   **Frontend:** http://localhost:5173
-    *   **Backend API:** http://localhost:5000
-    *   **MongoDB:** `mongodb://localhost:27017`
-
-5.  **Seed Data (Optional)**
-    To populate the DB with realistic demo data (User: `mike@mastertasker.com` / Pass: `mike123`):
-    ```bash
-    docker-compose exec server npm run seed
-    ```
-
-## Screenshots
-
-### Home Page:
-![Home Page View](./screenshot/HomePage.png)
-
-### Calendar Page:
-![Calendar Work View](./screenshot/Calendar.png)
-
-### Summary Page:
-![Summary Page View](./screenshot/SummaryPage.png)
-
-### History Page:
-![History Page View](./screenshot/HistoryPage.png)
-
-### Add/Edit Task:
-![Add/Edit Task View](./screenshot/Add+Edit_Task.png)
-
-### Login/Carte Account: 
-![Add/Edit Task View](./screenshot/Login+Carte_Account.png)
-
-## Project Structure
+### Run the Project
 
 ```bash
-MasterTasker/
-├── client/                 # React Frontend
-│   ├── src/
-│   │   ├── components/     # Reusable UI (Buttons, Cards, Modals)
-│   │   ├── context/        # Global State (TaskContext)
-│   │   ├── features/       # Feature-based modules (Auth, Dashboard, Tasks)
-│   │   ├── hooks/          # Custom Hooks (useTasks)
-│   │   ├── pages/          # Route Views (Dashboard, Work, Analytics)
-│   │   └── services/       # API Service Layer
-│   └── Dockerfile
-│
-├── server/                 # Node.js Backend
-│   ├── src/
-│   │   ├── config/         # DB Connection
-│   │   ├── controllers/    # Request Logic
-│   │   ├── middleware/     # Auth & Error Handling
-│   │   ├── models/         # Mongoose Schemas (Task, User)
-│   │   ├── routes/         # API Routes
-│   │   ├── services/       # Business Logic
-│   │   └── utils/          # Helpers (Seeder, Urgency Calc)
-│   └── Dockerfile
-│
-└── docker-compose.yml      # Orchestration
+git clone https://github.com/your-username/MasterTasker.git
+cd MasterTasker
+docker-compose up --build
 ```
 
-## Environment Variables
+Once running:
 
-| Variable | Description | Default (Dev) | Location |
-| :--- | :--- | :--- | :--- |
-| `PORT` | Backend server port | `5000` | `server/.env` |
-| `MONGO_URI` | MongoDB connection string | `mongodb://mongo:27017/...` | `server/.env` |
-| `JWT_SECRET` | Secret key for signing tokens | `mysecretkey123456` | `server/.env` |
-| `NODE_ENV` | Environment mode | `development` | `server/.env` |
-| `VITE_API_URL` | Backend URL for Frontend | `http://localhost:5000/api` | `client/.env` |
+* Frontend → [http://localhost:5173](http://localhost:5173)
+* Backend API → [http://localhost:5000](http://localhost:5000)
+
+### Optional: Seed Demo Data
+
+```bash
+docker-compose exec server npm run seed
+```
+
+Demo user:
+**Email:** `mike@mastertasker.com`
+**Password:** `mike123`
+
+## Why this project?
+
+I wanted to build a real-world application that goes beyond a basic CRUD app — something that involves state management, scheduling logic, authentication, and a meaningful user experience.
+
+MasterTasker helped me practice:
+
+* Designing a full-stack architecture
+* Handling complex recurring task logic
+* Building a responsive, interactive UI
+* Working with Docker in a real development setup
+
+## Future Improvements
+
+* Notifications and reminders
+* Recurring task exceptions
+* Improved mobile experience
+* Better analytics and insights
 
 ## License
 
-This project is licensed under the MIT License.
+MIT License
