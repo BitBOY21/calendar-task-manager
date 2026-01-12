@@ -8,8 +8,8 @@
 
 ## About
 
-A simple and intuitive calendar and task management app built to help users stay organized without overcomplicating their workflow.  
-This project focuses on clean design, practical features, and a smooth user experience for everyday planning.
+MasterTasker is a calendar-based task management app built to make everyday planning simpler and more intuitive.
+The goal of this project was to create something practical and pleasant to use, without overwhelming the user with unnecessary complexity.
 
 ## Key Features
 
